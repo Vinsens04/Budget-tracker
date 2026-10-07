@@ -46,7 +46,7 @@ try {
     );
     assert.equal(
       await page.locator("html").getAttribute("data-theme"),
-      theme === "dark" ? "dark" : "light",
+      theme === "light" ? "light" : "dark",
     );
     await page.waitForTimeout(350);
     await page.screenshot({ path: `artifacts/theme-${theme}-picker.png` });

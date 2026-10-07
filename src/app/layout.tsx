@@ -20,7 +20,7 @@ export default function Layout({
   return (
     <html
       lang="en"
-      data-theme="light"
+      data-theme="dark"
       data-palette="green"
       suppressHydrationWarning
     >

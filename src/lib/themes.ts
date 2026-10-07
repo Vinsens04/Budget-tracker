@@ -22,20 +22,20 @@ export const visualThemes = [
   {
     id: "green",
     name: "Green",
-    description: "The original paper & forest",
-    background: "#f2f1e9",
-    surface: "#fcfcf7",
-    ink: "#224d3b",
-    accent: "#d8eca7",
+    description: "Deep forest & soft jade",
+    background: "#0e1e19",
+    surface: "#192f26",
+    ink: "#091610",
+    accent: "#93d7b6",
   },
   {
     id: "blue",
     name: "Blue",
-    description: "Ocean blues & cool whites",
-    background: "#edf4ff",
-    surface: "#ffffff",
-    ink: "#174b86",
-    accent: "#b9dcff",
+    description: "Deep navy & ice blue",
+    background: "#0e1b2e",
+    surface: "#192c44",
+    ink: "#0a1425",
+    accent: "#9bc8f3",
   },
 ] as const;
 export function isVisualTheme(value: unknown): value is VisualTheme {
@@ -59,17 +59,17 @@ export function withVisualTheme(
   return {
     ...settings,
     visualTheme,
-    theme: visualTheme === "dark" ? "dark" : "light",
+    theme: visualTheme === "light" ? "light" : "dark",
   };
 }
 export function applyVisualTheme(theme: VisualTheme) {
-  document.documentElement.dataset.theme = theme === "dark" ? "dark" : "light";
+  document.documentElement.dataset.theme = theme === "light" ? "light" : "dark";
   document.documentElement.dataset.palette =
     theme === "green" ? "green" : theme === "blue" ? "blue" : "neutral";
   document.documentElement.style.colorScheme =
-    theme === "dark" ? "dark" : "light";
+    theme === "light" ? "light" : "dark";
 }
 export const themeStorageKey = "saldo.visual-theme";
 // Read a validated device preference before first paint. Account preferences
 // remain authoritative once the signed-in workspace has loaded.
-export const themeInitScript = `try{const t=localStorage.getItem('${themeStorageKey}');if(['light','dark','green','blue'].includes(t)){const r=document.documentElement;r.dataset.theme=t==='dark'?'dark':'light';r.dataset.palette=t==='green'?'green':t==='blue'?'blue':'neutral';r.style.colorScheme=t==='dark'?'dark':'light'}}catch{}`;
+export const themeInitScript = `try{const t=localStorage.getItem('${themeStorageKey}');if(['light','dark','green','blue'].includes(t)){const r=document.documentElement;r.dataset.theme=t==='light'?'light':'dark';r.dataset.palette=t==='green'?'green':t==='blue'?'blue':'neutral';r.style.colorScheme=t==='light'?'light':'dark'}}catch{}`;

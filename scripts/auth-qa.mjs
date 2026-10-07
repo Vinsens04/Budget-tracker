@@ -168,7 +168,7 @@ try {
     assert.equal(savedTheme.data.state.settings.visualTheme, theme);
     assert.equal(
       savedTheme.data.state.settings.theme,
-      theme === "dark" ? "dark" : "light",
+      theme === "light" ? "light" : "dark",
     );
   }
   await page.reload();

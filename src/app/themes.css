@@ -1,16 +1,35 @@
 /* Palette choices share the journal's layout and typography. */
-:root {
-  --category-1: #608b6f;
-  --category-2: #b5bf79;
-  --category-3: #d5b878;
-  --category-4: #ce916f;
-  --category-5: #9a9e75;
-  --category-6: #83aa97;
-  --category-7: #9c998c;
-  --sidebar-muted: #abbba1;
-  --sidebar-avatar: #395341;
-  --balance-muted: #c0d1b4;
-  --button-hover: #345c43;
+:root,
+[data-palette="green"] {
+  --bg: #0e1e19;
+  --surface: #192f26;
+  --text: #e5f2eb;
+  --secondary: #a7beb2;
+  --divider: #345044;
+  --blue: #93d7b6;
+  --blue-soft: #284737;
+  --subtle: #223c30;
+  --chrome: #0e1e19;
+  --ink: #091610;
+  --forest: #204c39;
+  --lime: #93d7b6;
+  --chart-tooltip-bg: #223c30;
+  --chart-tooltip-edge: #507a65;
+  --chart-tooltip-shadow: 4px 5px 0 #00000030;
+  --chart-line: #93d7b6;
+  --chart-cursor: #93d7b614;
+  --chart-cursor-stroke: #93d7b670;
+  --category-1: #85c9a5;
+  --category-2: #c4cf91;
+  --category-3: #d9bd85;
+  --category-4: #cda486;
+  --category-5: #a6c4bb;
+  --category-6: #79b4b2;
+  --category-7: #aab19c;
+  --sidebar-muted: #a6bdb0;
+  --sidebar-avatar: #243d30;
+  --balance-muted: #c3e3d1;
+  --button-hover: #b1e6cb;
 }
 [data-palette="neutral"][data-theme="light"] {
   --bg: #f5f6f8;
@@ -75,35 +94,35 @@
   --button-hover: #c8dcf7;
 }
 [data-palette="blue"] {
-  --bg: #edf4ff;
-  --surface: #ffffff;
-  --text: #1b3454;
-  --secondary: #5e7190;
-  --divider: #d2e0f3;
-  --blue: #2563b5;
-  --blue-soft: #dfedff;
-  --subtle: #eef4fc;
-  --chrome: #edf4ff;
-  --ink: #112e57;
-  --forest: #174b86;
-  --lime: #b9dcff;
-  --chart-tooltip-bg: #ffffff;
-  --chart-tooltip-edge: #bfd5ef;
-  --chart-tooltip-shadow: 4px 5px 0 #174b8612;
-  --chart-line: #2563b5;
-  --chart-cursor: #2563b510;
-  --chart-cursor-stroke: #2563b570;
-  --category-1: #3271b8;
-  --category-2: #72b0d1;
-  --category-3: #889cd3;
-  --category-4: #b398ce;
-  --category-5: #65a6b1;
-  --category-6: #8ac3d8;
-  --category-7: #9cacc0;
-  --sidebar-muted: #b7cbe7;
-  --sidebar-avatar: #254a7d;
-  --balance-muted: #c6ddf7;
-  --button-hover: #245990;
+  --bg: #0e1b2e;
+  --surface: #192c44;
+  --text: #e7effb;
+  --secondary: #a8bad3;
+  --divider: #354f70;
+  --blue: #9bc8f3;
+  --blue-soft: #284567;
+  --subtle: #223954;
+  --chrome: #0e1b2e;
+  --ink: #0a1425;
+  --forest: #254b76;
+  --lime: #9bc8f3;
+  --chart-tooltip-bg: #223954;
+  --chart-tooltip-edge: #5278a2;
+  --chart-tooltip-shadow: 4px 5px 0 #00000030;
+  --chart-line: #9bc8f3;
+  --chart-cursor: #9bc8f314;
+  --chart-cursor-stroke: #9bc8f370;
+  --category-1: #86b8ef;
+  --category-2: #87cbd6;
+  --category-3: #a6b3e5;
+  --category-4: #bcabe0;
+  --category-5: #82b5c3;
+  --category-6: #a2d2e7;
+  --category-7: #acbbd0;
+  --sidebar-muted: #adbfda;
+  --sidebar-avatar: #263e5c;
+  --balance-muted: #d0e3fa;
+  --button-hover: #b8daff;
 }
 .brand-caption,
 .sidebar-label,
@@ -114,6 +133,14 @@
 }
 .sidebar .avatar {
   background: var(--sidebar-avatar);
+}
+[data-palette="green"] .nav-item:not(.active),
+[data-palette="blue"] .nav-item:not(.active) {
+  color: var(--sidebar-muted);
+}
+[data-palette="green"] .nav-item:not(.active):hover,
+[data-palette="blue"] .nav-item:not(.active):hover {
+  color: var(--text);
 }
 .balance-top,
 .balance-top .icon-button,

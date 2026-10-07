@@ -1682,8 +1682,8 @@ export default function BudgetApp() {
                         >
                           <option value="light">Light</option>
                           <option value="dark">Dark</option>
-                          <option value="green">Green · Original</option>
-                          <option value="blue">Blue</option>
+                          <option value="green">Green · Forest</option>
+                          <option value="blue">Blue · Navy</option>
                         </select>
                       </Field>
                     </div>
