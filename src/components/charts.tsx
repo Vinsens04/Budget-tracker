@@ -265,7 +265,7 @@ export function ComparisonChart({
           <Bar
             dataKey="income"
             name="Income"
-            fill="#579a69"
+            fill="var(--income)"
             radius={[4, 4, 0, 0]}
             isAnimationActive={reduced === false}
             animationDuration={450}
@@ -274,7 +274,7 @@ export function ComparisonChart({
           <Bar
             dataKey="expense"
             name="Expenses"
-            fill="#b67550"
+            fill="var(--expense)"
             radius={[4, 4, 0, 0]}
             isAnimationActive={reduced === false}
             animationDuration={450}

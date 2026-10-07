@@ -32,6 +32,8 @@ export function ThemePicker({
                 "--preview-surface": theme.surface,
                 "--preview-ink": theme.ink,
                 "--preview-accent": theme.accent,
+                "--preview-sidebar": theme.sidebar,
+                "--preview-hero": theme.hero,
               } as CSSProperties
             }
           >

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./ledger.css";
 import "./themes.css";
+import "./studio.css";
 import { themeInitScript } from "@/lib/themes";
 export const metadata: Metadata = {
   title: "Saldo — Your financial journal",

@@ -247,6 +247,7 @@ export function Sheet({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: reduced ? 0 : 0.18 }}
           onClick={onClose}
         >
           <motion.div
@@ -255,10 +256,13 @@ export function Sheet({
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            initial={reduced ? { opacity: 0 } : { y: 70, opacity: 0 }}
+            initial={reduced ? { opacity: 0 } : { y: 24, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={reduced ? { opacity: 0 } : { y: 70, opacity: 0 }}
-            transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+            exit={reduced ? { opacity: 0 } : { y: 16, opacity: 0 }}
+            transition={{
+              duration: reduced ? 0 : 0.26,
+              ease: [0.22, 1, 0.36, 1],
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sheet-grabber" />

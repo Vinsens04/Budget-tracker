@@ -104,12 +104,15 @@ const navigation: { name: Page; icon: LucideIcon }[] = [
   { name: "Saving goals", icon: Target },
 ];
 const surfaceVariants = {
-  hidden: (reduced: boolean) => ({ opacity: 0, y: reduced ? 0 : 10 }),
-  visible: {
+  hidden: (reduced: boolean) => ({ opacity: 0, y: reduced ? 0 : 8 }),
+  visible: (reduced: boolean) => ({
     opacity: 1,
     y: 0,
-    transition: { type: "spring" as const, bounce: 0, duration: 0.34 },
-  },
+    transition: {
+      duration: reduced ? 0 : 0.32,
+      ease: [0.22, 1, 0.36, 1] as const,
+    },
+  }),
 };
 type Editor =
   | { kind: "budget"; item?: Budget }
@@ -359,26 +362,17 @@ export default function BudgetApp() {
           <ChevronRight size={18} />
         </button>
       </div>
-      <div className="budget-plan-label">THIS MONTH’S SPENDING PLAN</div>
+      <div className="budget-plan-label">SPENT THIS MONTH</div>
       <div className="budget-number">
         {money(summary.expense)} <small>of {money(budgetTotal)}</small>
-      </div>
-      <div className="budget-meter" aria-hidden="true">
-        {Array.from({ length: 24 }, (_, i) => (
-          <span
-            key={i}
-            className={
-              budgetTotal > 0 && i < Math.min(24, Math.round((used * 24) / 100))
-                ? "used"
-                : ""
-            }
-          />
-        ))}
       </div>
       <Progress value={used} />
       <div className="budget-foot">
         <span>{Math.round(used)}% used</span>
-        <span>{money(Math.max(0, budgetTotal - summary.expense))} left</span>
+        <span>
+          <strong>{money(Math.max(0, budgetTotal - summary.expense))}</strong>{" "}
+          left
+        </span>
       </div>
       <div className="budget-status">
         <span
@@ -577,7 +571,7 @@ export default function BudgetApp() {
   return (
     <MotionConfig
       reducedMotion="user"
-      transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+      transition={{ type: "tween", duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className="app-shell">
         <aside className="sidebar">
@@ -594,7 +588,7 @@ export default function BudgetApp() {
             </span>
             saldo<span className="brand-period">.</span>
           </a>
-          <p className="brand-caption">THE EVERYDAY MONEY JOURNAL</p>
+          <p className="brand-caption">Your personal finance space</p>
           <div className="sidebar-label">WORKSPACE</div>
           <nav aria-label="Main navigation">
             {navigation.map(({ name, icon: Icon }) => (
@@ -604,8 +598,18 @@ export default function BudgetApp() {
                 key={name}
                 onClick={() => select(name)}
               >
+                {page === name && (
+                  <motion.span
+                    className="nav-selection"
+                    layoutId="sidebar-selection"
+                    transition={{
+                      duration: reduced ? 0 : 0.24,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                  />
+                )}
                 <Icon size={20} strokeWidth={1.8} />
-                {name}
+                <span>{name}</span>
               </button>
             ))}
           </nav>
@@ -624,8 +628,18 @@ export default function BudgetApp() {
                 key={name}
                 onClick={() => select(name)}
               >
+                {page === name && (
+                  <motion.span
+                    className="nav-selection"
+                    layoutId="sidebar-selection"
+                    transition={{
+                      duration: reduced ? 0 : 0.24,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                  />
+                )}
                 <Icon size={20} strokeWidth={1.8} />
-                {name}
+                <span>{name}</span>
               </button>
             ))}
           </nav>
@@ -648,7 +662,7 @@ export default function BudgetApp() {
           <header className="topbar">
             <div className="breadcrumb">
               <span className="workspace-wordmark">saldo.</span>
-              <span className="workspace-name">Personal ledger</span>{" "}
+              <span className="workspace-name">Personal space</span>{" "}
               <ChevronRight size={14} /> <strong>{page}</strong>
             </div>
             <div className="topbar-actions">
@@ -662,6 +676,9 @@ export default function BudgetApp() {
                 onClick={() => setThemePicker(true)}
               >
                 <Palette size={20} />
+                <span>
+                  {activeTheme[0].toUpperCase() + activeTheme.slice(1)}
+                </span>
               </button>
               <button
                 className="icon-button notification-button"
@@ -689,9 +706,9 @@ export default function BudgetApp() {
               visible: {
                 opacity: 1,
                 transition: {
-                  duration: 0.12,
-                  delayChildren: 0.02,
-                  staggerChildren: reduced ? 0 : 0.045,
+                  duration: reduced ? 0 : 0.12,
+                  delayChildren: reduced ? 0 : 0.02,
+                  staggerChildren: reduced ? 0 : 0.035,
                 },
               },
             }}
@@ -701,13 +718,13 @@ export default function BudgetApp() {
                 {page === "Overview" ? (
                   <>
                     <p className="eyebrow">
-                      <span className="ledger-dot" /> YOUR FINANCIAL JOURNAL
+                      <span className="ledger-dot" /> YOUR MONEY, AT A GLANCE
                     </p>
                     <h1>
                       Hello, {state.settings.name}
                       <span className="greeting-dot">.</span>
                     </h1>
-                    <p>Your everyday money. The bigger picture.</p>
+                    <p>A little clarity for your everyday money.</p>
                   </>
                 ) : (
                   <>
@@ -858,7 +875,7 @@ export default function BudgetApp() {
                         {hidden ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                       <span className="balance-wallets">
-                        Across {state.wallets.length} wallets
+                        <WalletIcon size={14} /> {state.wallets.length} wallets
                       </span>
                     </div>
                     <div className="balance-value">
@@ -873,8 +890,22 @@ export default function BudgetApp() {
                         .filter((w) => !w.archived)
                         .slice(0, 3)
                         .map((w) => (
-                          <button key={w.id} onClick={() => select("Wallets")}>
-                            <span>{w.name}</span>
+                          <button
+                            key={w.id}
+                            title={
+                              hidden
+                                ? w.name
+                                : `${w.name}: ${money(walletBalance(state, w.id))}`
+                            }
+                            onClick={() => select("Wallets")}
+                          >
+                            <span
+                              className="wallet-pill-mark"
+                              aria-hidden="true"
+                            >
+                              {w.name.slice(0, 1)}
+                            </span>
+                            <span className="wallet-pill-name">{w.name}</span>
                             <strong>
                               {hidden
                                 ? "•••••"
@@ -1820,6 +1851,16 @@ export default function BudgetApp() {
                   : select(name as Page)
               }
             >
+              {page === name && (
+                <motion.span
+                  className="dock-selection"
+                  layoutId="dock-selection"
+                  transition={{
+                    duration: reduced ? 0 : 0.24,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                />
+              )}
               <Icon size={22} />
               <span>{label}</span>
             </button>

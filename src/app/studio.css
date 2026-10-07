@@ -1,0 +1,1019 @@
+/* A quiet financial desk: clear account rails, soft surfaces and steady motion. */
+:root {
+  --sidebar-bg: var(--ink);
+  --sidebar-text: var(--sidebar-muted);
+  --selection-bg: var(--blue-soft);
+  --selection-text: var(--lime);
+  --income: #87cbb0;
+  --expense: #d8aa8e;
+  --hero-text: #f0f6f2;
+  --surface-shadow: 0 4px 18px #00000008;
+  --overlay: #040d0bcc;
+}
+[data-palette="neutral"][data-theme="light"] {
+  --sidebar-bg: #fafbfa;
+  --sidebar-text: #66736e;
+  --selection-bg: #e6efea;
+  --selection-text: #27654f;
+  --income: #3b8068;
+  --expense: #b97552;
+  --hero-text: #f3f7f4;
+  --overlay: #15282166;
+  --surface-shadow: 0 3px 16px #1c342807;
+}
+[data-palette="neutral"][data-theme="dark"] {
+  --selection-bg: #32383d;
+  --selection-text: #f0f2f3;
+  --income: #a6c8b7;
+  --expense: #d2b49a;
+  --hero-text: #f1f3f4;
+  --overlay: #05070bd4;
+}
+[data-palette="blue"] {
+  --selection-bg: #29445f;
+  --selection-text: #c5dff7;
+  --income: #91c7cb;
+  --expense: #c5addc;
+  --hero-text: #edf4ff;
+  --overlay: #030a16cc;
+}
+body {
+  font-family: "DM Sans", sans-serif;
+}
+h1 {
+  letter-spacing: -0.045em;
+}
+h2,
+h3,
+.card-heading h2,
+.sheet-header h2 {
+  font-family: "DM Sans", sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.balance-value,
+.wallet-balance,
+.chart-summary > strong,
+.stat > strong,
+.budget-number,
+.donut-label strong,
+.detail-amount,
+.chart-tooltip-amount,
+.amount-field input {
+  font-family: "DM Sans", sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.045em;
+}
+.sidebar {
+  width: 234px;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--divider);
+  padding: 29px 18px 20px;
+  color: var(--text);
+}
+.brand {
+  font-size: 30px;
+  margin: 0 12px 6px;
+  color: var(--text);
+}
+.brand-mark {
+  width: 30px;
+  height: 32px;
+  border-radius: 9px;
+  transform: none;
+}
+.brand-mark svg {
+  width: 19px;
+  height: 19px;
+}
+.brand-caption {
+  margin-bottom: 34px;
+  font-size: 11px;
+  letter-spacing: 0;
+  color: var(--sidebar-text);
+}
+.sidebar-label {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: var(--sidebar-text);
+  opacity: 0.85;
+}
+.nav-item {
+  position: relative;
+  isolation: isolate;
+  border-radius: 11px;
+  padding: 12px 14px;
+  margin-bottom: 5px;
+}
+[data-palette] .sidebar .nav-item:not(.active) {
+  color: var(--sidebar-text);
+}
+[data-palette] .sidebar .nav-item:not(.active):hover {
+  color: var(--text);
+  background: var(--subtle);
+}
+.nav-item.active {
+  background: transparent;
+  color: var(--selection-text);
+  font-weight: 600;
+}
+.nav-item.active::after {
+  display: none;
+}
+.nav-selection {
+  position: absolute;
+  inset: 0;
+  border-radius: 11px;
+  background: var(--selection-bg);
+  z-index: -1;
+}
+.nav-item > svg {
+  width: 18px;
+  height: 18px;
+}
+.tools-label {
+  margin-top: 28px;
+}
+.user-card {
+  border-top-color: var(--divider);
+  padding-top: 18px;
+  color: var(--text);
+}
+.user-card .avatar {
+  background: var(--subtle);
+  color: var(--blue);
+  border-radius: 50%;
+}
+.user-card small,
+.user-card > svg {
+  color: var(--sidebar-text);
+}
+.nav-item:active {
+  transform: none;
+}
+.privacy-note {
+  color: var(--sidebar-text);
+  font-size: 10px;
+}
+.workspace {
+  margin-left: 234px;
+}
+.topbar {
+  height: 76px;
+  padding: 0 36px;
+  border-color: color-mix(in srgb, var(--divider) 65%, transparent);
+}
+.topbar-actions {
+  gap: 13px;
+}
+.demo-label {
+  color: var(--secondary);
+  font-size: 11px;
+}
+.icon-button {
+  border-radius: 50%;
+}
+.icon-button:hover {
+  background: var(--subtle);
+}
+.topbar .theme-menu-button {
+  width: auto;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--divider);
+  border-radius: 24px;
+  font-size: 11px;
+  min-height: 36px;
+  height: 36px;
+  color: var(--text);
+}
+.theme-menu-button svg {
+  width: 16px;
+  height: 16px;
+}
+.small-avatar {
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  background: var(--blue-soft);
+}
+main {
+  max-width: 1450px;
+  padding: 32px 36px 24px;
+}
+.page-heading {
+  margin-bottom: 28px;
+}
+.page-heading h1 {
+  font-size: clamp(30px, 2.6vw, 40px);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.eyebrow {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  margin-bottom: 12px;
+}
+.ledger-dot {
+  border-radius: 50%;
+  width: 5px;
+  height: 5px;
+}
+.page-heading p:not(.eyebrow) {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.primary,
+.secondary {
+  border-radius: 10px;
+  min-height: 44px;
+  padding: 11px 16px;
+  font-size: 12px;
+}
+.primary:hover {
+  box-shadow: none;
+  transform: none;
+}
+.text-button {
+  text-decoration: none;
+  font-size: 11px;
+  gap: 4px;
+}
+.text-button:hover {
+  color: var(--blue);
+}
+.month-control {
+  border-radius: 10px;
+  background: var(--surface);
+  min-height: 44px;
+}
+.month-control button {
+  height: 42px;
+}
+.card {
+  padding: 24px;
+  border-radius: 18px;
+  border-color: color-mix(in srgb, var(--divider) 75%, transparent);
+  box-shadow: var(--surface-shadow);
+  margin-bottom: 20px;
+}
+.card-heading {
+  margin-bottom: 19px;
+}
+.card-heading h2 {
+  font-size: 16px;
+}
+.card-heading p {
+  font-size: 11px;
+  margin-top: 5px;
+}
+.summary-grid,
+.dashboard-grid {
+  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  gap: 20px;
+}
+.balance-card {
+  background: var(--forest);
+  border-color: transparent;
+  padding: 25px 27px 0;
+  color: var(--hero-text);
+}
+.balance-top {
+  gap: 7px;
+}
+.balance-title {
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.balance-top .icon-button {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+}
+.balance-wallets {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  opacity: 0.85;
+}
+.balance-value {
+  font-size: clamp(36px, 3.3vw, 51px);
+  font-weight: 500;
+  margin: 12px 0 20px;
+  line-height: 1.16;
+}
+.wallet-pills {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding-bottom: 23px;
+}
+.wallet-pills button {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 4px 7px;
+  padding: 9px;
+  border: 1px solid color-mix(in srgb, var(--hero-text) 13%, transparent);
+  border-radius: 9px;
+  min-width: 0;
+  text-align: left;
+  min-height: 59px;
+}
+.wallet-pill-mark {
+  width: 22px;
+  height: 22px;
+  background: color-mix(in srgb, var(--hero-text) 10%, transparent);
+  border-radius: 6px;
+  grid-row: span 2;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  color: var(--hero-text);
+  font-size: 10px;
+}
+.wallet-pill-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+}
+.wallet-pills button strong {
+  color: var(--hero-text);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  letter-spacing: -0.015em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.balance-bottom {
+  border-top-color: color-mix(in srgb, var(--hero-text) 20%, transparent);
+  padding: 20px 0 22px;
+  gap: 17px;
+}
+.balance-bottom::before {
+  left: -36px;
+}
+.balance-bottom::after {
+  right: -36px;
+}
+.balance-bottom strong {
+  color: var(--hero-text);
+  font-size: 18px;
+  font-weight: 500;
+}
+.balance-bottom small {
+  font-size: 10px;
+  margin-bottom: 5px;
+}
+.summary-icon {
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+}
+.income-icon {
+  color: var(--lime);
+  background: color-mix(in srgb, var(--lime) 12%, transparent);
+}
+.expense-icon {
+  color: #e4c3aa;
+  background: #e4c3aa12;
+}
+.monthly-budget {
+  padding: 25px;
+}
+.budget-plan-label {
+  margin-top: 10px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--secondary);
+}
+.budget-number {
+  font-size: 31px;
+  font-weight: 500;
+  margin: 12px 0 23px;
+}
+.monthly-budget .budget-number {
+  display: block;
+}
+.budget-number small {
+  display: block;
+  margin: 7px 0 0;
+  font-size: 12px;
+  color: var(--secondary);
+}
+.monthly-budget > .progress {
+  height: 8px;
+  margin-bottom: 12px;
+}
+.progress,
+.progress > span {
+  border-radius: 6px;
+}
+.budget-foot {
+  gap: 8px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.budget-foot strong {
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 500;
+}
+.budget-status {
+  margin-top: auto;
+  padding-top: 20px;
+  font-size: 10px;
+}
+.segmented {
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--subtle);
+  border: 0;
+}
+.segmented button {
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 10px;
+  min-height: 29px;
+}
+.segmented-pill {
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--divider) 70%, transparent);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px #00000006;
+}
+.chart-summary {
+  margin: 8px 0 22px;
+  gap: 10px;
+}
+.chart-summary > strong {
+  font-size: 30px;
+  font-weight: 500;
+}
+.comparison {
+  border-radius: 20px;
+  padding: 5px 8px;
+  font-size: 9px;
+}
+.area-chart {
+  height: 212px;
+}
+.donut-label strong {
+  font-size: 17px;
+  font-weight: 500;
+}
+.donut-label small {
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+.category-legend {
+  margin-top: 17px;
+  gap: 11px;
+}
+.category-legend > div {
+  font-size: 11px;
+  padding: 3px 0;
+}
+.category-legend strong {
+  font-size: 11px;
+  font-weight: 500;
+}
+.legend-dot {
+  border-radius: 50%;
+  width: 7px;
+  height: 7px;
+}
+.insight,
+[data-theme="dark"] .insight {
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  background: transparent;
+  padding: 15px 17px;
+  margin-bottom: 20px;
+}
+.insight strong {
+  font-size: 12px;
+}
+.insight p {
+  line-height: 1.65;
+}
+.recent-card {
+  padding-bottom: 10px;
+}
+.transaction {
+  min-height: 74px;
+  border-color: color-mix(in srgb, var(--divider) 60%, transparent);
+  border-radius: 8px;
+  padding: 13px 0;
+}
+.transaction:hover {
+  background: var(--subtle);
+}
+.transaction .category-icon {
+  border: 0;
+  border-radius: 12px;
+  width: 39px;
+  height: 39px;
+}
+[data-theme="dark"] .category-icon svg {
+  filter: none;
+}
+.transaction-copy strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+.transaction-copy small {
+  font-size: 10px;
+}
+.transaction-amount strong {
+  font-size: 13px;
+  font-weight: 500;
+}
+.transaction-amount small {
+  font-size: 10px;
+}
+.mini-goal {
+  border-radius: 9px;
+  padding: 12px 0;
+}
+.mini-goal:hover {
+  background: var(--subtle);
+}
+.goal-icon,
+.category-icon,
+.report-icon {
+  border-radius: 11px;
+}
+.report-link {
+  border-radius: 15px;
+  background: var(--surface);
+  padding: 17px;
+}
+.report-link strong {
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+}
+.report-link small {
+  font-size: 11px;
+  margin-top: 4px;
+}
+.report-icon {
+  background: var(--blue-soft);
+  width: 38px;
+  height: 38px;
+}
+.management-grid {
+  gap: 20px;
+}
+.budget-item,
+.wallet-card {
+  border-top: 1px solid var(--divider);
+}
+.wallet-card::before {
+  border-radius: 10px;
+}
+input,
+textarea,
+select,
+.picker-button {
+  border-radius: 10px;
+  font-size: 13px;
+}
+input::placeholder {
+  color: var(--secondary);
+  opacity: 0.7;
+}
+.quick-add {
+  border-radius: 12px;
+}
+.switch {
+  border-radius: 20px;
+}
+.switch::after {
+  border-radius: 50%;
+}
+.sheet-overlay {
+  background: var(--overlay);
+}
+.sheet {
+  border-radius: 22px;
+  box-shadow: 0 22px 90px #00000030;
+  border: 1px solid var(--divider);
+}
+.sheet-header h2 {
+  font-size: 22px;
+}
+.sheet-grabber {
+  border-radius: 9px;
+}
+.toast {
+  border-radius: 14px;
+  box-shadow: 0 8px 28px #00000018;
+  font-size: 12px;
+}
+.chart-tooltip {
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 12px 32px #00000022;
+}
+.chart-tooltip-icon {
+  border-radius: 9px;
+}
+.chart-tooltip-share {
+  border-radius: 20px;
+}
+.chart-tooltip-amount {
+  font-size: 24px;
+  font-weight: 500;
+}
+.tooltip-income {
+  color: var(--income);
+  background: color-mix(in srgb, var(--income) 12%, transparent);
+}
+.tooltip-expense {
+  color: var(--expense);
+  background: color-mix(in srgb, var(--expense) 12%, transparent);
+}
+.legend-income {
+  background: var(--income);
+}
+.legend-expense {
+  background: var(--expense);
+}
+.comparison-legend i {
+  border-radius: 50%;
+}
+.theme-option {
+  padding: 11px;
+  border-radius: 14px;
+  gap: 9px;
+}
+.theme-option.selected {
+  box-shadow: 0 0 0 1px var(--blue);
+  background: var(--subtle);
+}
+.theme-preview {
+  border-radius: 8px;
+  height: 105px;
+}
+.theme-preview-sidebar {
+  background: var(--preview-sidebar);
+  border-right: 1px solid #ffffff09;
+}
+.theme-preview-balance {
+  background: var(--preview-hero);
+  border-radius: 6px;
+}
+.theme-preview-panels i {
+  border-bottom: 0;
+  border-radius: 5px;
+}
+.theme-option strong {
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+}
+.theme-check {
+  width: 21px;
+  height: 21px;
+}
+.app-footer {
+  border-color: color-mix(in srgb, var(--divider) 65%, transparent);
+  padding-top: 18px;
+  font-size: 10px;
+}
+@media (min-width: 1600px) {
+  .sidebar {
+    width: 244px;
+  }
+  .workspace {
+    margin-left: 244px;
+  }
+}
+@media (max-width: 1150px) and (min-width: 901px) {
+  .sidebar {
+    width: 211px;
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+  .workspace {
+    margin-left: 211px;
+  }
+  main {
+    padding: 30px 26px 24px;
+  }
+  .topbar {
+    padding: 0 26px;
+  }
+  .summary-grid,
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  }
+  .wallet-pills {
+    gap: 6px;
+  }
+  .wallet-pills button {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 9px 7px;
+  }
+  .wallet-pill-mark {
+    display: none;
+  }
+  .balance-bottom strong {
+    font-size: 15px;
+  }
+  .summary-icon {
+    display: none;
+  }
+}
+@media (max-width: 900px) {
+  .workspace {
+    margin-left: 0;
+  }
+  .topbar {
+    padding: 0 24px;
+    height: 68px;
+  }
+  main {
+    padding: 30px 24px 120px;
+  }
+  .bottom-nav {
+    background: var(--sidebar-bg);
+    border-color: var(--divider);
+    border-radius: 20px;
+    padding: 9px 7px;
+    box-shadow: 0 12px 35px #00000024;
+  }
+  .bottom-nav button {
+    color: var(--sidebar-text);
+    position: relative;
+    isolation: isolate;
+    border-radius: 13px;
+  }
+  .bottom-nav button.active {
+    color: var(--blue);
+  }
+  .dock-selection {
+    position: absolute;
+    inset: 0 3px;
+    background: var(--selection-bg);
+    border-radius: 13px;
+    z-index: -1;
+  }
+  .bottom-nav button:active {
+    transform: none;
+  }
+  .bottom-nav .add-nav > svg {
+    border-radius: 13px;
+  }
+}
+@media (max-width: 650px) {
+  .topbar {
+    padding: 0 18px;
+    height: 65px;
+  }
+  .topbar-actions {
+    gap: 5px;
+  }
+  .demo-label {
+    display: none;
+  }
+  .topbar .theme-menu-button {
+    border: 0;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+  }
+  .theme-menu-button > span {
+    display: none;
+  }
+  .theme-menu-button svg {
+    width: 20px;
+    height: 20px;
+  }
+  .small-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  .workspace-wordmark {
+    font-size: 25px;
+  }
+  main {
+    padding: 25px 18px 116px;
+  }
+  .page-heading {
+    margin-bottom: 22px;
+    gap: 18px;
+  }
+  .page-heading h1 {
+    font-size: 31px;
+    margin-bottom: 6px;
+  }
+  .page-heading .eyebrow {
+    font-size: 8px;
+    letter-spacing: 0.09em;
+    margin-bottom: 10px;
+  }
+  .page-heading p:not(.eyebrow) {
+    font-size: 12px;
+  }
+  .month-control {
+    min-height: 42px;
+  }
+  .month-control button {
+    height: 40px;
+  }
+  .summary-grid,
+  .dashboard-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .card {
+    padding: 20px;
+    border-radius: 17px;
+    margin-bottom: 17px;
+  }
+  .balance-card {
+    padding: 21px 21px 0;
+  }
+  .balance-value {
+    font-size: clamp(33px, 9vw, 43px);
+    margin: 12px 0 20px;
+  }
+  .balance-wallets {
+    font-size: 9px;
+  }
+  .balance-wallets svg {
+    width: 12px;
+    height: 12px;
+  }
+  .balance-title {
+    font-size: 10px;
+  }
+  .wallet-pills {
+    gap: 7px;
+    padding-bottom: 21px;
+  }
+  .wallet-pills button {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 5px;
+    padding: 8px;
+    min-height: 52px;
+  }
+  .wallet-pill-mark {
+    display: none;
+  }
+  .wallet-pills button strong {
+    font-size: 10px;
+  }
+  .balance-bottom {
+    padding: 18px 0 20px;
+    gap: 11px;
+  }
+  .balance-bottom strong {
+    font-size: 15px;
+  }
+  .balance-bottom small {
+    font-size: 9px;
+  }
+  .balance-bottom::before {
+    left: -30px;
+  }
+  .balance-bottom::after {
+    right: -30px;
+  }
+  .balance-bottom > div + div {
+    padding-left: 12px;
+  }
+  .summary-icon {
+    width: 28px;
+    height: 28px;
+  }
+  .monthly-budget .card-heading {
+    margin-bottom: 13px;
+  }
+  .monthly-budget .budget-number {
+    font-size: 28px;
+    margin: 10px 0 18px;
+  }
+  .monthly-budget .budget-number small {
+    display: block;
+    font-size: 11px;
+    margin: 5px 0 0;
+  }
+  .monthly-budget > .progress {
+    height: 7px;
+  }
+  .budget-status {
+    padding-top: 15px;
+  }
+  .spending-card .card-heading {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .card-heading h2 {
+    font-size: 16px;
+  }
+  .chart-summary {
+    margin: 16px 0 18px;
+  }
+  .chart-summary > strong {
+    font-size: 27px;
+  }
+  .area-chart {
+    height: 193px;
+  }
+  .transaction-amount strong {
+    font-size: 12px;
+  }
+  .transaction .category-icon {
+    width: 34px;
+    height: 34px;
+  }
+  .insight {
+    margin-bottom: 17px;
+  }
+  .sheet {
+    border-radius: 24px 24px 0 0;
+  }
+  .theme-preview {
+    height: 96px;
+  }
+  .theme-option {
+    padding: 9px;
+  }
+}
+@media (max-width: 350px) {
+  main {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .card {
+    padding: 18px;
+  }
+  .balance-card {
+    padding: 19px 18px 0;
+  }
+  .balance-bottom::before {
+    left: -27px;
+  }
+  .balance-bottom::after {
+    right: -27px;
+  }
+  .balance-bottom strong {
+    font-size: 13px;
+  }
+  .balance-bottom .summary-icon {
+    display: none;
+  }
+  .wallet-pills {
+    gap: 5px;
+  }
+  .wallet-pills button {
+    padding: 7px 5px;
+  }
+  .transaction-copy strong {
+    font-size: 12px;
+  }
+  .transaction-amount strong {
+    font-size: 11px;
+  }
+  .chart-summary > strong {
+    font-size: 25px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root,
+  .balance-card,
+  .topbar,
+  .wallet-pills button {
+    transition:
+      background-color 220ms ease,
+      color 220ms ease,
+      border-color 220ms ease;
+  }
+  .text-button svg,
+  .report-link > svg {
+    transition: transform 180ms ease;
+  }
+  .text-button:hover svg,
+  .report-link:hover > svg {
+    transform: translateX(2px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
+  }
+  button:active {
+    transform: none;
+  }
+}
