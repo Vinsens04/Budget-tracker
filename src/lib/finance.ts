@@ -473,7 +473,7 @@ export function seedState(): FinanceState {
     ],
     contributions: [],
     settings: {
-      name: "Vinsens",
+      name: "guess",
       theme: "system",
       defaultWallet: "bca",
       currency: "IDR",

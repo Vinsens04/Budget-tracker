@@ -686,9 +686,7 @@ export default function BudgetApp() {
               <ChevronRight size={14} /> <strong>{page}</strong>
             </div>
             <div className="topbar-actions">
-              <span className="demo-label">
-                {user ? "Connected account" : "Demo · session only"}
-              </span>
+              {user && <span className="demo-label">Connected account</span>}
               <button
                 className="icon-button theme-menu-button"
                 aria-label="Change theme"
