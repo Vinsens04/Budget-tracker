@@ -1,9 +1,23 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
 import "./ledger.css";
 import "./themes.css";
 import "./studio.css";
+import "./typography.css";
 import { themeInitScript } from "@/lib/themes";
+const jakarta = localFont({
+  src: "./fonts/plus-jakarta-sans.woff2",
+  variable: "--font-jakarta",
+  weight: "400 800",
+  display: "swap",
+});
+const manrope = localFont({
+  src: "./fonts/manrope.woff2",
+  variable: "--font-manrope",
+  weight: "400 700",
+  display: "swap",
+});
 export const metadata: Metadata = {
   title: "Saldo — Your financial journal",
   description:
@@ -21,6 +35,7 @@ export default function Layout({
   return (
     <html
       lang="en"
+      className={`${jakarta.variable} ${manrope.variable}`}
       data-theme="dark"
       data-palette="green"
       suppressHydrationWarning

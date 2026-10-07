@@ -1,0 +1,146 @@
+/* Jakarta for the interface; Manrope's steady figures for monetary values. */
+:root,
+body {
+  font-family: var(--font-jakarta), sans-serif;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+h1,
+h2,
+h3,
+.card-heading h2,
+.sheet-header h2,
+.brand,
+.workspace-wordmark,
+.wallet-brand,
+.report-link strong,
+.footer-mark,
+.theme-option strong,
+.recharts-text {
+  font-family: var(--font-jakarta), sans-serif;
+}
+.page-heading h1 {
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.22;
+}
+h2,
+h3,
+.card-heading h2,
+.sheet-header h2 {
+  font-weight: 650;
+  letter-spacing: -0.025em;
+}
+.brand,
+.workspace-wordmark {
+  font-weight: 800;
+  letter-spacing: -0.06em;
+}
+.balance-value,
+.wallet-balance,
+.chart-summary > strong,
+.stat > strong,
+.budget-number,
+.donut-label strong,
+.detail-amount,
+.chart-tooltip-amount,
+.amount-field input,
+.amount-field > div > span,
+.wallet-pills button strong,
+.balance-bottom strong,
+.budget-foot strong,
+.transaction-amount strong,
+.mini-goal small,
+.mini-goal > small,
+.goal-card > strong,
+.transfer-row > strong,
+.detail-list strong,
+.chart-tooltip-row > strong,
+.calendar-total strong {
+  font-family: var(--font-manrope), sans-serif;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.balance-value,
+.wallet-balance,
+.chart-summary > strong,
+.budget-number,
+.donut-label strong,
+.detail-amount,
+.chart-tooltip-amount {
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+.balance-value {
+  font-size: clamp(35px, 3.25vw, 49px);
+}
+.stat > strong {
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+.budget-number small {
+  font-family: var(--font-jakarta), sans-serif;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.balance-bottom strong,
+.transaction-amount strong,
+.wallet-pills button strong {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.nav-item {
+  font-size: 12px;
+}
+.page-heading p:not(.eyebrow),
+.card-heading p,
+.insight p {
+  line-height: 1.7;
+}
+.transaction-copy strong {
+  font-weight: 600;
+}
+.transaction-copy small {
+  line-height: 1.65;
+}
+.eyebrow,
+.sidebar-label {
+  font-weight: 600;
+}
+.wallet-brand {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.chart-tooltip-row > strong {
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+@media (max-width: 650px) {
+  .page-heading h1 {
+    font-size: 29px;
+    letter-spacing: -0.045em;
+  }
+  .balance-value {
+    font-size: clamp(30px, 8.3vw, 39px);
+  }
+  .balance-bottom strong {
+    font-size: 14px;
+  }
+  .transaction-amount strong {
+    font-size: 11px;
+  }
+  .chart-summary > strong {
+    font-size: 26px;
+  }
+}
+@media (max-width: 350px) {
+  .balance-bottom strong {
+    font-size: 12px;
+  }
+  .transaction-amount strong {
+    font-size: 10px;
+  }
+  .page-heading h1 {
+    font-size: 27px;
+  }
+}
