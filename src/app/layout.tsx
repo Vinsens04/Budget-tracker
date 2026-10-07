@@ -12,10 +12,16 @@ const jakarta = localFont({
   weight: "400 800",
   display: "swap",
 });
-const manrope = localFont({
-  src: "./fonts/manrope.woff2",
-  variable: "--font-manrope",
+const figures = localFont({
+  src: "./fonts/space-grotesk.woff2",
+  variable: "--font-figures",
   weight: "400 700",
+  display: "swap",
+});
+const display = localFont({
+  src: "./fonts/bricolage-grotesque.woff2",
+  variable: "--font-display",
+  weight: "400 800",
   display: "swap",
 });
 export const metadata: Metadata = {
@@ -35,7 +41,7 @@ export default function Layout({
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} ${manrope.variable}`}
+      className={`${jakarta.variable} ${figures.variable} ${display.variable}`}
       data-theme="dark"
       data-palette="green"
       suppressHydrationWarning

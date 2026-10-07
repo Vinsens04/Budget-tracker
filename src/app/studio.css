@@ -22,20 +22,28 @@
   --surface-shadow: 0 3px 16px #1c342807;
 }
 [data-palette="neutral"][data-theme="dark"] {
-  --selection-bg: #32383d;
-  --selection-text: #f0f2f3;
+  --selection-bg: #25231e;
+  --selection-text: #eee6d1;
   --income: #a6c8b7;
   --expense: #d2b49a;
-  --hero-text: #f1f3f4;
-  --overlay: #05070bd4;
+  --hero-text: #f3f1eb;
+  --overlay: #000000d4;
 }
 [data-palette="blue"] {
-  --selection-bg: #29445f;
-  --selection-text: #c5dff7;
-  --income: #91c7cb;
-  --expense: #c5addc;
-  --hero-text: #edf4ff;
-  --overlay: #030a16cc;
+  --selection-bg: #25315a;
+  --selection-text: #d2dcff;
+  --income: #82d2d9;
+  --expense: #b9a1f2;
+  --hero-text: #f2f4ff;
+  --overlay: #030516cc;
+}
+[data-palette="blue"] .balance-card {
+  background: linear-gradient(115deg, #294cac, #293879);
+  border-color: #4e68bb;
+}
+[data-palette="neutral"][data-theme="dark"] .balance-card {
+  border-color: #37342c;
+  box-shadow: inset 0 1px 0 #ffffff06;
 }
 body {
   font-family: "DM Sans", sans-serif;
