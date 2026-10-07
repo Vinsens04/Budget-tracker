@@ -103,8 +103,16 @@ export function SpendingChart({
         >
           <defs>
             <linearGradient id="spendingFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#007aff" stopOpacity={0.17} />
-              <stop offset="100%" stopColor="#007aff" stopOpacity={0} />
+              <stop
+                offset="0%"
+                stopColor="var(--chart-line)"
+                stopOpacity={0.17}
+              />
+              <stop
+                offset="100%"
+                stopColor="var(--chart-line)"
+                stopOpacity={0}
+              />
             </linearGradient>
           </defs>
           <CartesianGrid
@@ -143,7 +151,7 @@ export function SpendingChart({
             type="monotone"
             dataKey="expense"
             name="Spending"
-            stroke="#007aff"
+            stroke="var(--chart-line)"
             strokeWidth={2.5}
             fill="url(#spendingFill)"
             isAnimationActive={reduced === false}
@@ -171,7 +179,7 @@ export function CategoryChart({
             data={
               data.length
                 ? data
-                : [{ name: "No spending", value: 1, color: "#e9e9ed" }]
+                : [{ name: "No spending", value: 1, color: "var(--divider)" }]
             }
             dataKey="value"
             innerRadius={64}
@@ -183,9 +191,11 @@ export function CategoryChart({
             animationDuration={450}
             animationEasing="ease-out"
           >
-            {(data.length ? data : [{ color: "#e9e9ed" }]).map((c, i) => (
-              <Cell key={i} fill={c.color} />
-            ))}
+            {(data.length ? data : [{ color: "var(--divider)" }]).map(
+              (c, i) => (
+                <Cell key={i} fill={c.color} />
+              ),
+            )}
           </Pie>
           <Tooltip
             content={(props) => (
@@ -255,7 +265,7 @@ export function ComparisonChart({
           <Bar
             dataKey="income"
             name="Income"
-            fill="#34c759"
+            fill="#579a69"
             radius={[4, 4, 0, 0]}
             isAnimationActive={reduced === false}
             animationDuration={450}
@@ -264,7 +274,7 @@ export function ComparisonChart({
           <Bar
             dataKey="expense"
             name="Expenses"
-            fill="#007aff"
+            fill="#b67550"
             radius={[4, 4, 0, 0]}
             isAnimationActive={reduced === false}
             animationDuration={450}

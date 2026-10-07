@@ -43,8 +43,8 @@ export function CategoryIcon({
     <span
       className="category-icon"
       style={{
-        color: colors[index % colors.length],
-        background: `${colors[index % colors.length]}15`,
+        color: colors[Math.max(0, index) % colors.length],
+        background: `${colors[Math.max(0, index) % colors.length]}15`,
       }}
     >
       <Icon size={20} strokeWidth={1.8} />
@@ -76,7 +76,7 @@ export function Progress({ value, color }: { value: number; color?: string }) {
           transformOrigin: "left center",
           background:
             color ??
-            (value >= 90 ? "#ff3b30" : value > 70 ? "#ff9500" : "#007aff"),
+            (value >= 90 ? "#be5947" : value > 70 ? "#b67550" : "#2e6b50"),
         }}
       />
     </div>

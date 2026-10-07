@@ -335,8 +335,21 @@ export default function BudgetApp() {
           <ChevronRight size={18} />
         </button>
       </div>
+      <div className="budget-plan-label">THIS MONTH’S SPENDING PLAN</div>
       <div className="budget-number">
         {money(summary.expense)} <small>of {money(budgetTotal)}</small>
+      </div>
+      <div className="budget-meter" aria-hidden="true">
+        {Array.from({ length: 24 }, (_, i) => (
+          <span
+            key={i}
+            className={
+              budgetTotal > 0 && i < Math.min(24, Math.round((used * 24) / 100))
+                ? "used"
+                : ""
+            }
+          />
+        ))}
       </div>
       <Progress value={used} />
       <div className="budget-foot">
@@ -346,7 +359,7 @@ export default function BudgetApp() {
       <div className="budget-status">
         <span
           className="status-dot"
-          style={{ background: used >= 90 ? "#ff9500" : "#34c759" }}
+          style={{ background: used >= 90 ? "#b67550" : "#579a69" }}
         />
         {budgetTotal === 0
           ? "Set a budget to start planning"
@@ -422,7 +435,7 @@ export default function BudgetApp() {
       className="card"
     >
       <div className="card-heading">
-        <h2>Saving for something</h2>
+        <h2>On the horizon</h2>
         <button className="text-button" onClick={() => select("Saving goals")}>
           View all
         </button>
@@ -444,7 +457,7 @@ export default function BudgetApp() {
               </small>
               <Progress
                 value={(g.saved / g.target) * 100}
-                color={i ? "#5ac8fa" : "#007aff"}
+                color={i ? "#b5bf79" : "#2e6b50"}
               />
             </span>
             <small>{Math.round((g.saved / g.target) * 100)}%</small>
@@ -511,7 +524,7 @@ export default function BudgetApp() {
         <Sparkles size={22} />
       </span>
       <div>
-        <strong>A little perspective</strong>
+        <strong>The month, in perspective</strong>
         <p>
           {summary.income
             ? `You’ve kept ${Math.round(summary.rate)}% of your income this month. ${summary.rate >= 30 ? "A little consistency goes a long way." : "Every small step helps."}`
@@ -557,11 +570,13 @@ export default function BudgetApp() {
             </span>
             saldo<span className="brand-period">.</span>
           </a>
-          <div className="sidebar-label">YOUR FINANCES</div>
+          <p className="brand-caption">THE EVERYDAY MONEY JOURNAL</p>
+          <div className="sidebar-label">WORKSPACE</div>
           <nav aria-label="Main navigation">
             {navigation.map(({ name, icon: Icon }) => (
               <button
                 className={`nav-item ${page === name ? "active" : ""}`}
+                aria-current={page === name ? "page" : undefined}
                 key={name}
                 onClick={() => select(name)}
               >
@@ -570,7 +585,7 @@ export default function BudgetApp() {
               </button>
             ))}
           </nav>
-          <div className="sidebar-label tools-label">A LITTLE MORE CLARITY</div>
+          <div className="sidebar-label tools-label">PLAN & REFLECT</div>
           <nav aria-label="More tools">
             {(
               [
@@ -581,6 +596,7 @@ export default function BudgetApp() {
             ).map(({ name, icon: Icon }) => (
               <button
                 className={`nav-item ${page === name ? "active" : ""}`}
+                aria-current={page === name ? "page" : undefined}
                 key={name}
                 onClick={() => select(name)}
               >
@@ -592,7 +608,7 @@ export default function BudgetApp() {
           <div className="sidebar-bottom">
             <div className="privacy-note">
               <ShieldCheck size={17} />
-              <span>Your money. Your space.</span>
+              <span>A place for every rupiah.</span>
             </div>
             <button className="user-card" onClick={() => select("Profile")}>
               <span className="avatar">{state.settings.name.slice(0, 1)}</span>
@@ -607,7 +623,9 @@ export default function BudgetApp() {
         <div className="workspace">
           <header className="topbar">
             <div className="breadcrumb">
-              My workspace <ChevronRight size={14} /> <strong>{page}</strong>
+              <span className="workspace-wordmark">saldo.</span>
+              <span className="workspace-name">Personal ledger</span>{" "}
+              <ChevronRight size={14} /> <strong>{page}</strong>
             </div>
             <div className="topbar-actions">
               <span className="demo-label">
@@ -632,7 +650,7 @@ export default function BudgetApp() {
           </header>
           <motion.main
             key={page}
-            initial="hidden"
+            initial={reduced ? false : "hidden"}
             animate="visible"
             variants={{
               hidden: { opacity: 0 },
@@ -650,16 +668,20 @@ export default function BudgetApp() {
               <div>
                 {page === "Overview" ? (
                   <>
-                    <p className="eyebrow">YOUR MONEY, A LITTLE CLEARER</p>
+                    <p className="eyebrow">
+                      <span className="ledger-dot" /> YOUR FINANCIAL JOURNAL
+                    </p>
                     <h1>
                       Hello, {state.settings.name}
                       <span className="greeting-dot">.</span>
                     </h1>
-                    <p>Make room for what matters.</p>
+                    <p>Your everyday money. The bigger picture.</p>
                   </>
                 ) : (
                   <>
-                    <p className="eyebrow">YOUR PERSONAL FINANCES</p>
+                    <p className="eyebrow">
+                      <span className="ledger-dot" /> YOUR FINANCIAL JOURNAL
+                    </p>
                     <h1>{page}</h1>
                     <p>
                       {
@@ -795,7 +817,7 @@ export default function BudgetApp() {
                     className="card balance-card"
                   >
                     <div className="balance-top">
-                      <span>Total balance</span>
+                      <span className="balance-title">Total balance</span>
                       <button
                         className="icon-button"
                         aria-label={hidden ? "Show balance" : "Hide balance"}
@@ -813,6 +835,21 @@ export default function BudgetApp() {
                       ) : (
                         <AnimatedAmount value={balance} />
                       )}
+                    </div>
+                    <div className="wallet-pills" aria-label="Wallet balances">
+                      {state.wallets
+                        .filter((w) => !w.archived)
+                        .slice(0, 3)
+                        .map((w) => (
+                          <button key={w.id} onClick={() => select("Wallets")}>
+                            <span>{w.name}</span>
+                            <strong>
+                              {hidden
+                                ? "•••••"
+                                : money(walletBalance(state, w.id))}
+                            </strong>
+                          </button>
+                        ))}
                     </div>
                     <div className="balance-bottom">
                       <div>
@@ -852,6 +889,7 @@ export default function BudgetApp() {
                 <div className="dashboard-grid">
                   <div className="dashboard-main">
                     {spendingCard}
+                    {insight}
                     <motion.section
                       variants={surfaceVariants}
                       custom={!!reduced}
@@ -872,7 +910,6 @@ export default function BudgetApp() {
                         walletNames={walletNames}
                       />
                     </motion.section>
-                    {insight}
                   </div>
                   <div className="dashboard-aside">
                     {categoryCard}
@@ -885,7 +922,7 @@ export default function BudgetApp() {
                         <FileChartColumn size={22} />
                       </span>
                       <span>
-                        <strong>Your monthly story</strong>
+                        <strong>Close the books</strong>
                         <small>See your financial report</small>
                       </span>
                       <ChevronRight size={18} />
@@ -1095,13 +1132,11 @@ export default function BudgetApp() {
                       variants={surfaceVariants}
                       custom={!!reduced}
                       className={`card wallet-card ${w.archived ? "archived" : ""}`}
+                      style={{ borderTopColor: colors[i % colors.length] }}
                       key={w.id}
                     >
                       <div className="card-heading">
-                        <span
-                          className="wallet-brand"
-                          style={{ color: colors[i % colors.length] }}
-                        >
+                        <span className="wallet-brand">
                           <Landmark size={23} />
                           {w.name}
                         </span>
@@ -1723,7 +1758,7 @@ export default function BudgetApp() {
                 <WalletIcon size={14} />
                 saldo.
               </span>
-              <span>A little more clarity. A little less worry.</span>
+              <span>Good habits. A little more breathing room.</span>
             </footer>
           </motion.main>
         </div>

@@ -27,7 +27,7 @@ export function ChartTooltip({
   const first = entries[0];
   const title = String(first.payload?.tooltipLabel ?? label ?? "Spending");
   const name = String(first.name ?? first.payload?.name ?? "Other");
-  const color = first.payload?.color ?? first.color ?? first.fill ?? "#007aff";
+  const color = first.payload?.color ?? first.color ?? first.fill ?? "#2e6b50";
   const percentage =
     total > 0 ? Math.round((Number(first.value) / total) * 100) : 0;
   const Icon = categoryIcons[name] ?? ArrowUpRight;

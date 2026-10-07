@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import "./ledger.css";
 export const metadata: Metadata = {
-  title: "Saldo — A little more clarity",
+  title: "Saldo — Your financial journal",
   description:
     "Your money, thoughtfully organized. Track expenses, budgets, wallets and saving goals.",
   icons: { icon: "/favicon.svg" },

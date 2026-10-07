@@ -164,13 +164,13 @@ export const categories = [
   "Freelance",
 ];
 export const colors = [
-  "#007aff",
-  "#5ac8fa",
-  "#a1b5e8",
-  "#ffb45b",
-  "#b7a3df",
-  "#5dc8aa",
-  "#a5a5ae",
+  "#608b6f",
+  "#b5bf79",
+  "#d5b878",
+  "#ce916f",
+  "#9a9e75",
+  "#83aa97",
+  "#9c998c",
 ];
 export const money = (value: number) =>
   `Rp ${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value)}`;

@@ -5,7 +5,7 @@
   --text: #1d1d1f;
   --secondary: #74747d;
   --divider: rgba(0, 0, 0, 0.065);
-  --blue: #007aff;
+  --blue: #2e6b50;
   --blue-soft: #edf5ff;
   --subtle: #f7f8fa;
   --chrome: rgba(255, 255, 255, 0.86);
@@ -69,7 +69,7 @@ a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 3px solid #007aff80;
+  outline: 3px solid #2e6b5080;
   outline-offset: 3px;
 }
 h1,
@@ -392,7 +392,7 @@ main {
   padding: 12px 17px;
   font-weight: 550;
   font-size: 0.8125rem;
-  box-shadow: 0 3px 8px #007aff12;
+  box-shadow: 0 3px 8px #2e6b5012;
 }
 .primary:hover {
   background: #006ee5;
@@ -513,12 +513,12 @@ main {
   justify-content: center;
 }
 .income-icon {
-  background: #34c7590e;
+  background: #579a690e;
   color: #28b950;
 }
 .expense-icon {
-  background: #ff95000c;
-  color: #ff9500;
+  background: #b675500c;
+  color: #b67550;
 }
 .monthly-budget {
   padding: 23px 25px;
@@ -1376,7 +1376,7 @@ main {
 }
 .form-error {
   padding: 12px 15px;
-  background: #ff3b300c;
+  background: #be59470c;
   border-radius: 12px;
   color: #ce413a;
   font-size: 0.8125rem;
@@ -1433,7 +1433,7 @@ main {
   justify-content: center;
   gap: 8px;
   color: #e54940;
-  background: #ff3b300b;
+  background: #be59470b;
   border-radius: 12px;
   padding: 12px 15px;
   font-size: 0.8125rem;
@@ -1471,7 +1471,7 @@ main {
   transition: transform 0.15s;
 }
 .switch:checked {
-  background: #34c759;
+  background: #579a69;
 }
 .switch:checked:after {
   transform: translateX(18px);
@@ -1685,12 +1685,12 @@ main {
   white-space: nowrap;
 }
 .tooltip-income {
-  color: #34c759;
-  background: #34c75914;
+  color: #579a69;
+  background: #579a6914;
 }
 .tooltip-expense {
-  color: #007aff;
-  background: #007aff14;
+  color: #2e6b50;
+  background: #2e6b5014;
 }
 .comparison-legend {
   display: flex;
@@ -1712,10 +1712,10 @@ main {
   border-radius: 50%;
 }
 .legend-income {
-  background: #34c759;
+  background: #579a69;
 }
 .legend-expense {
-  background: #007aff;
+  background: #2e6b50;
 }
 .area-chart:has(.comparison-legend) {
   height: 225px;
