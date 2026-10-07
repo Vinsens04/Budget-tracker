@@ -14,8 +14,8 @@ import {
   Cell,
   BarChart,
   Bar,
-  Legend,
 } from "recharts";
+import { ChartTooltip, ComparisonLegend } from "./chart-tooltip";
 import {
   categoryTotals,
   shortMoney,
@@ -52,6 +52,14 @@ export function timeline(
         period === "Year" ? t.date.startsWith(key) : t.date === key,
       );
       return {
+        tooltipLabel: new Date(
+          `${key}${period === "Year" ? "-01" : ""}T12:00:00`,
+        ).toLocaleDateString(
+          "en-GB",
+          period === "Year"
+            ? { month: "long", year: "numeric" }
+            : { day: "numeric", month: "short", year: "numeric" },
+        ),
         label:
           period === "Year"
             ? new Date(`${key}-01T12:00:00`).toLocaleDateString("en", {
@@ -119,13 +127,17 @@ export function SpendingChart({
             tick={{ fill: "var(--secondary)", fontSize: 12 }}
           />
           <Tooltip
-            formatter={(v) => money(Number(v))}
-            contentStyle={{
-              border: 0,
-              borderRadius: 14,
-              background: "var(--surface)",
-              boxShadow: "0 4px 25px #0001",
+            content={(props) => <ChartTooltip {...props} kind="spending" />}
+            cursor={{
+              stroke: "var(--chart-cursor-stroke)",
+              strokeWidth: 1,
+              strokeDasharray: "4 4",
             }}
+            wrapperStyle={{ zIndex: 10, outline: "none" }}
+            isAnimationActive={reduced === false}
+            animationDuration={120}
+            animationEasing="ease-out"
+            offset={12}
           />
           <Area
             type="monotone"
@@ -175,7 +187,16 @@ export function CategoryChart({
               <Cell key={i} fill={c.color} />
             ))}
           </Pie>
-          <Tooltip formatter={(v) => money(Number(v))} />
+          <Tooltip
+            content={(props) => (
+              <ChartTooltip {...props} kind="category" total={total} />
+            )}
+            wrapperStyle={{ zIndex: 10, outline: "none" }}
+            isAnimationActive={reduced === false}
+            animationDuration={120}
+            animationEasing="ease-out"
+            offset={14}
+          />
         </PieChart>
       </ResponsiveContainer>
       <div className="donut-label">
@@ -203,6 +224,11 @@ export function ComparisonChart({
     <div className="area-chart">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
+          <CartesianGrid
+            vertical={false}
+            stroke="var(--divider)"
+            strokeDasharray="3 5"
+          />
           <XAxis
             dataKey="label"
             minTickGap={30}
@@ -217,8 +243,15 @@ export function ComparisonChart({
             width={45}
             tick={{ fill: "var(--secondary)", fontSize: 12 }}
           />
-          <Tooltip formatter={(v) => money(Number(v))} />
-          <Legend />
+          <Tooltip
+            content={(props) => <ChartTooltip {...props} kind="comparison" />}
+            cursor={{ fill: "var(--chart-cursor)" }}
+            wrapperStyle={{ zIndex: 10, outline: "none" }}
+            isAnimationActive={reduced === false}
+            animationDuration={120}
+            animationEasing="ease-out"
+            offset={12}
+          />
           <Bar
             dataKey="income"
             name="Income"
@@ -239,6 +272,7 @@ export function ComparisonChart({
           />
         </BarChart>
       </ResponsiveContainer>
+      <ComparisonLegend />
     </div>
   );
 }
