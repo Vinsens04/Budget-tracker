@@ -8,6 +8,11 @@ import {
   nextOccurrence,
   processRecurring,
   seedState,
+  availableCategories,
+  updateCategory,
+  categoryTotals,
+  categoryInUse,
+  emptyState,
   type FinanceState,
 } from "../src/lib/finance.ts";
 test("quick entry handles Indonesian currency suffixes and grouping", () => {
@@ -21,6 +26,80 @@ test("quick entry handles Indonesian currency suffixes and grouping", () => {
   assert.equal(parseQuick("Coffee 55.000")?.amount, 55000);
   assert.equal(parseQuick("Invalid zero 0"), null);
   assert.equal(parseQuick("No amount"), null);
+});
+test("custom category renames preserve every linked record and analytics totals", () => {
+  let state = seedState();
+  state = updateCategory(state, {
+    id: "custom",
+    name: "Education",
+    type: "expense",
+  });
+  state.transactions.push({
+    ...state.transactions[0],
+    id: "school",
+    category: "Education",
+    amount: 500000,
+  });
+  state.budgets.push({
+    id: "school-budget",
+    category: "Education",
+    limit: 1000000,
+    threshold: 75,
+    month: "2026-10",
+  });
+  state.recurring.push({
+    ...state.recurring[0],
+    id: "school-rule",
+    category: "Education",
+  });
+  assert(availableCategories(state, "expense").includes("Education"));
+  assert(!availableCategories(state, "income").includes("Education"));
+  assert(categoryInUse(state, "Education"));
+  assert.throws(() =>
+    updateCategory(state, { id: "custom", name: "Education", type: "income" }),
+  );
+  state = updateCategory(state, {
+    id: "custom",
+    name: "Learning",
+    type: "expense",
+  });
+  assert.equal(
+    state.transactions.find((t) => t.id === "school")?.category,
+    "Learning",
+  );
+  assert.equal(
+    state.budgets.find((b) => b.id === "school-budget")?.category,
+    "Learning",
+  );
+  assert.equal(
+    state.recurring.find((r) => r.id === "school-rule")?.category,
+    "Learning",
+  );
+  assert.equal(
+    categoryTotals(state.transactions).find((c) => c.name === "Learning")
+      ?.value,
+    500000,
+  );
+  assert.throws(() =>
+    updateCategory(state, {
+      id: "duplicate",
+      name: "learning",
+      type: "expense",
+    }),
+  );
+  assert.throws(() =>
+    updateCategory(state, { id: "duplicate", name: "Salary", type: "expense" }),
+  );
+});
+test("new accounts have a valid default wallet and no sample income", () => {
+  const state = emptyState("Friend");
+  assert.equal(state.settings.defaultWallet, state.wallets[0].id);
+  assert.deepEqual(totals(state.transactions), {
+    income: 0,
+    expense: 0,
+    saved: 0,
+    rate: 0,
+  });
 });
 test("wallet transfer preserves total balance and income/expense totals", () => {
   const state = seedState();

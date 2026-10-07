@@ -47,6 +47,7 @@ import {
 import { useFinance } from "@/lib/use-finance";
 import {
   categories,
+  availableCategories,
   categoryTotals,
   colors,
   money,
@@ -79,6 +80,7 @@ import {
   type Period,
 } from "./charts";
 import TransactionForm from "./transaction-form";
+import { CategoryManager, FirstSetup } from "./setup-tools";
 type Page =
   | "Overview"
   | "Transactions"
@@ -133,7 +135,8 @@ function download(name: string, text: string, type = "application/json") {
 }
 export default function BudgetApp() {
   const reduced = useReducedMotion();
-  const { state, user, busy, error, commit, reload, configured } = useFinance();
+  const { state, user, busy, error, offline, commit, reload, configured } =
+    useFinance();
   const [page, setPage] = useState<Page>("Overview");
   const [month, setMonth] = useState(today().slice(0, 7));
   const [period, setPeriod] = useState<Period>("Month");
@@ -154,6 +157,47 @@ export default function BudgetApp() {
   const [showFilters, setShowFilters] = useState(false);
   const [calendarDate, setCalendarDate] = useState(today());
   const [hidden, setHidden] = useState(false);
+  const [categoryManager, setCategoryManager] = useState(false);
+  const [setup, setSetup] = useState(false);
+  const [urlReady, setUrlReady] = useState(false);
+  useEffect(() => {
+    const restore = () => {
+      const query = new URLSearchParams(window.location.search);
+      const pages: Page[] = [
+        "Overview",
+        "Transactions",
+        "Budgets",
+        "Wallets",
+        "Analytics",
+        "Saving goals",
+        "Recurring",
+        "Calendar",
+        "Reports",
+        "Profile",
+      ];
+      const next = pages.find(
+        (p) => p.toLowerCase().replaceAll(" ", "-") === query.get("view"),
+      );
+      setPage(next ?? "Overview");
+      const value = query.get("month");
+      setMonth(
+        value && /^\d{4}-(0[1-9]|1[0-2])$/.test(value)
+          ? value
+          : today().slice(0, 7),
+      );
+      setUrlReady(true);
+    };
+    restore();
+    window.addEventListener("popstate", restore);
+    return () => window.removeEventListener("popstate", restore);
+  }, []);
+  useEffect(() => {
+    if (!urlReady) return;
+    const url = new URL(window.location.href);
+    url.searchParams.set("view", page.toLowerCase().replaceAll(" ", "-"));
+    url.searchParams.set("month", month);
+    window.history.replaceState(null, "", url);
+  }, [page, month, urlReady]);
   useEffect(() => {
     if (!toast) return;
     const timeout = setTimeout(() => setToast(""), 3500);
@@ -165,7 +209,7 @@ export default function BudgetApp() {
   }, []);
   const notify = (message: string) => setToast(message);
   const save = async (next: FinanceState, message: string) => {
-    await commit(next);
+    await commit(next, state);
     notify(message);
   };
   const monthTx = useMemo(
@@ -253,6 +297,12 @@ export default function BudgetApp() {
       : []),
   ];
   const select = (next: Page) => {
+    if (next !== page) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("view", next.toLowerCase().replaceAll(" ", "-"));
+      url.searchParams.set("month", month);
+      window.history.pushState(null, "", url);
+    }
     setPage(next);
     window.scrollTo({ top: 0, behavior: "instant" });
   };
@@ -702,8 +752,42 @@ export default function BudgetApp() {
                 ) : null}
               </div>
             </div>
+            {offline && user && (
+              <div className="connection-banner" role="status">
+                You’re offline. Your loaded finances are available to view;
+                reconnect before saving changes.
+              </div>
+            )}
             {page === "Overview" && (
               <>
+                {user &&
+                  !state.settings.onboardingComplete &&
+                  !state.transactions.length &&
+                  !state.budgets.length &&
+                  !state.goals.length && (
+                    <motion.section
+                      variants={surfaceVariants}
+                      custom={!!reduced}
+                      className="card welcome-card"
+                    >
+                      <span className="category-icon">
+                        <Sparkles size={22} />
+                      </span>
+                      <div>
+                        <h2>A fresh start for your finances</h2>
+                        <p>
+                          Set your first wallet and current balance, then make
+                          this space yours.
+                        </p>
+                      </div>
+                      <button
+                        className="primary"
+                        onClick={() => setSetup(true)}
+                      >
+                        Set up my space
+                      </button>
+                    </motion.section>
+                  )}
                 <div className="summary-grid">
                   <motion.section
                     variants={surfaceVariants}
@@ -843,7 +927,10 @@ export default function BudgetApp() {
                           value={categoryFilter}
                           onChange={(e) => setCategoryFilter(e.target.value)}
                         >
-                          {["All categories", ...categories].map((c) => (
+                          {[
+                            "All categories",
+                            ...availableCategories(state),
+                          ].map((c) => (
                             <option key={c}>{c}</option>
                           ))}
                         </select>
@@ -1267,9 +1354,8 @@ export default function BudgetApp() {
                 <div className="insight">
                   <Repeat size={22} />
                   <p>
-                    Due transactions are added automatically when you open the
-                    app. For processing while the app is closed, enable the
-                    Supabase schedule in the setup guide.
+                    Your saved schedules run automatically, even when the app is
+                    closed. Upcoming payments appear here and in your calendar.
                   </p>
                 </div>
               </>
@@ -1568,6 +1654,11 @@ export default function BudgetApp() {
                   custom={!!reduced}
                   className="card settings-tools"
                 >
+                  <button onClick={() => setCategoryManager(true)}>
+                    <SlidersHorizontal size={20} />
+                    Manage categories
+                    <ChevronRight size={18} />
+                  </button>
                   <button onClick={() => select("Budgets")}>
                     <WalletIcon size={20} />
                     Monthly budgets
@@ -1824,6 +1915,35 @@ export default function BudgetApp() {
         >
           {auth && (
             <AuthForm configured={configured} onDone={() => setAuth(false)} />
+          )}
+        </Sheet>
+        <Sheet
+          open={categoryManager}
+          title="Your categories"
+          onClose={() => {
+            if (!busy) setCategoryManager(false);
+          }}
+        >
+          {categoryManager && (
+            <CategoryManager state={state} busy={busy} onSave={save} />
+          )}
+        </Sheet>
+        <Sheet
+          open={setup}
+          title="Make yourself at home"
+          onClose={() => {
+            if (!busy) setSetup(false);
+          }}
+        >
+          {setup && (
+            <FirstSetup
+              state={state}
+              busy={busy}
+              onSave={async (next, message) => {
+                await save(next, message);
+                setSetup(false);
+              }}
+            />
           )}
         </Sheet>
         <Sheet
@@ -2214,11 +2334,9 @@ function EntityForm({
               name="category"
               defaultValue={editor.item?.category ?? "Food & Drinks"}
             >
-              {categories
-                .filter((c) => !["Salary", "Freelance"].includes(c))
-                .map((c) => (
-                  <option key={c}>{c}</option>
-                ))}
+              {availableCategories(state, "expense").map((c) => (
+                <option key={c}>{c}</option>
+              ))}
             </select>
           </Field>
           <Field label="Monthly limit · Rp">
@@ -2405,7 +2523,7 @@ function EntityForm({
           <div className="form-grid">
             <Field label="Category">
               <select name="category" defaultValue={editor.item?.category}>
-                {categories.map((c) => (
+                {availableCategories(state).map((c) => (
                   <option key={c}>{c}</option>
                 ))}
               </select>
@@ -2537,7 +2655,15 @@ function AuthForm({
         !result.data.session
       ) {
         setMessage("Check your email to confirm your account, then sign in.");
-      } else onDone();
+      } else {
+        if (mode === "New password") {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("recovery");
+          url.hash = "";
+          window.history.replaceState(null, "", url);
+        }
+        onDone();
+      }
     } catch {
       setMessage(
         mode === "Sign in"
@@ -2609,30 +2735,34 @@ function AuthForm({
           Forgot password?
         </button>
       )}
-      <div className="auth-divider">
-        <span>or</span>
-      </div>
-      <button
-        type="button"
-        className="secondary full"
-        disabled={busy}
-        onClick={async () => {
-          if (!supabase) return;
-          setBusy(true);
-          const { error } = await supabase.auth.signInWithOAuth({
-            provider: "google",
-            options: { redirectTo: window.location.origin },
-          });
-          if (error) {
-            setMessage(
-              "Google sign-in is unavailable. Enable Google in your Supabase Auth settings.",
-            );
-            setBusy(false);
-          }
-        }}
-      >
-        <span className="google-mark">G</span>Continue with Google
-      </button>
+      {process.env.NEXT_PUBLIC_GOOGLE_LOGIN_ENABLED === "true" && (
+        <>
+          <div className="auth-divider">
+            <span>or</span>
+          </div>
+          <button
+            type="button"
+            className="secondary full"
+            disabled={busy}
+            onClick={async () => {
+              if (!supabase) return;
+              setBusy(true);
+              const { error } = await supabase.auth.signInWithOAuth({
+                provider: "google",
+                options: { redirectTo: window.location.origin },
+              });
+              if (error) {
+                setMessage(
+                  "Google sign-in is temporarily unavailable. Please use your email instead.",
+                );
+                setBusy(false);
+              }
+            }}
+          >
+            <span className="google-mark">G</span>Continue with Google
+          </button>
+        </>
+      )}
     </form>
   );
 }

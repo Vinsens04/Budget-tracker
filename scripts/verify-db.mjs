@@ -68,7 +68,7 @@ try {
     db.query("select public.save_finance_workspace($1::jsonb,0)", [
       JSON.stringify(state),
     ]),
-    (error) => error.code === "40001",
+    (error) => error.code === "23505",
   );
   await db.query("rollback to invalid");
   result = await db.query("select name from public.wallets");

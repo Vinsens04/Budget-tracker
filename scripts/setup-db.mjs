@@ -19,6 +19,7 @@ try {
   for (const migration of [
     "supabase/migrations/001_finance.sql",
     "supabase/migrations/002_recurring.sql",
+    "supabase/migrations/003_revision_conflicts.sql",
   ])
     await client.query(fs.readFileSync(migration, "utf8"));
   await client.query("commit");

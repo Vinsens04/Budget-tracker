@@ -2395,3 +2395,58 @@ main {
     --divider: #72727a;
   }
 }
+/* Account setup follows the dashboard surfaces. */
+.welcome-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.welcome-card > div {
+  flex: 1;
+}
+.welcome-card h2 {
+  margin-bottom: 6px;
+  font-size: 19px;
+}
+.welcome-card p,
+.connection-banner {
+  color: var(--secondary);
+  font-size: 14px;
+  line-height: 1.55;
+}
+.connection-banner {
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: var(--surface);
+  margin-bottom: 20px;
+}
+.custom-category-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--divider);
+}
+.custom-category-row > div {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.custom-category-row small {
+  display: block;
+  margin-top: 4px;
+  color: var(--secondary);
+}
+.custom-category-row .icon-button {
+  flex-shrink: 0;
+}
+@media (max-width: 600px) {
+  .welcome-card {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .welcome-card .primary {
+    width: 100%;
+  }
+}

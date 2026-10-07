@@ -55,6 +55,8 @@ export type Contribution = {
   date: string;
 };
 export type Settings = {
+  customCategories?: CustomCategory[];
+  onboardingComplete?: boolean;
   name: string;
   theme: "light" | "dark" | "system";
   defaultWallet: string;
@@ -63,6 +65,83 @@ export type Settings = {
   recurringAlerts: boolean;
   reportAlerts: boolean;
 };
+export type CustomCategory = {
+  id: string;
+  name: string;
+  type: "expense" | "income";
+};
+export function availableCategories(
+  state: FinanceState,
+  type?: "expense" | "income",
+) {
+  const builtIn = categories.filter(
+    (name) =>
+      !type ||
+      (type === "income"
+        ? ["Salary", "Freelance", "Other"].includes(name)
+        : !["Salary", "Freelance"].includes(name)),
+  );
+  return [
+    ...new Set([
+      ...builtIn,
+      ...(state.settings.customCategories ?? [])
+        .filter((c) => !type || c.type === type)
+        .map((c) => c.name),
+      ...state.transactions
+        .filter((t) => !type || t.type === type)
+        .map((t) => t.category),
+    ]),
+  ];
+}
+export function updateCategory(
+  state: FinanceState,
+  category: CustomCategory,
+): FinanceState {
+  const name = category.name.trim();
+  if (!name || name.length > 60)
+    throw new Error("Use a category name between 1 and 60 characters.");
+  const custom = state.settings.customCategories ?? [];
+  if (
+    [
+      ...categories,
+      ...custom.filter((c) => c.id !== category.id).map((c) => c.name),
+    ].some((n) => n.toLowerCase() === name.toLowerCase())
+  )
+    throw new Error("A category with this name already exists.");
+  const previous = custom.find((c) => c.id === category.id);
+  if (
+    previous &&
+    previous.type !== category.type &&
+    categoryInUse(state, previous.name)
+  )
+    throw new Error("This category is in use. Keep its transaction type.");
+  const rename = (value: string) =>
+    previous && value === previous.name ? name : value;
+  return {
+    ...state,
+    transactions: state.transactions.map((t) => ({
+      ...t,
+      category: rename(t.category),
+    })),
+    budgets: state.budgets.map((b) => ({ ...b, category: rename(b.category) })),
+    recurring: state.recurring.map((r) => ({
+      ...r,
+      category: rename(r.category),
+    })),
+    settings: {
+      ...state.settings,
+      customCategories: [
+        ...custom.filter((c) => c.id !== category.id),
+        { ...category, name },
+      ],
+    },
+  };
+}
+export function categoryInUse(state: FinanceState, name: string) {
+  return [...state.transactions, ...state.budgets, ...state.recurring].some(
+    (item) => item.category === name,
+  );
+}
 export type FinanceState = {
   transactions: Transaction[];
   wallets: Wallet[];
@@ -229,7 +308,7 @@ export function validateTransfer(
     throw new Error("This wallet does not have enough funds.");
 }
 export function categoryTotals(transactions: Transaction[]) {
-  return categories
+  return [...new Set([...categories, ...transactions.map((t) => t.category)])]
     .map((name, i) => ({
       name,
       value: transactions
@@ -404,9 +483,10 @@ export function seedState(): FinanceState {
   };
 }
 export function emptyState(name: string): FinanceState {
+  const walletId = uid();
   return {
     transactions: [],
-    wallets: [{ id: uid(), name: "Cash", opening: 0, archived: false }],
+    wallets: [{ id: walletId, name: "Cash", opening: 0, archived: false }],
     budgets: [],
     goals: [],
     recurring: [],
@@ -415,7 +495,7 @@ export function emptyState(name: string): FinanceState {
     settings: {
       name,
       theme: "system",
-      defaultWallet: "",
+      defaultWallet: walletId,
       currency: "IDR",
       budgetAlerts: true,
       recurringAlerts: true,

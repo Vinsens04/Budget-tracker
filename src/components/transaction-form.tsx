@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 import { Camera, ChevronDown, Sparkles, Check } from "lucide-react";
 import {
-  categories,
+  availableCategories,
   parseQuick,
   today,
   uid,
@@ -294,25 +294,19 @@ export default function TransactionForm({
       >
         {picker === "category" ? (
           <div className="picker-list">
-            {categories
-              .filter((c) =>
-                type === "income"
-                  ? ["Salary", "Freelance", "Other"].includes(c)
-                  : !["Salary", "Freelance"].includes(c),
-              )
-              .map((c, i) => (
-                <button
-                  key={c}
-                  onClick={() => {
-                    setCategory(c);
-                    setPicker(null);
-                  }}
-                >
-                  <CategoryIcon category={c} index={i} />
-                  {c}
-                  {category === c && <Check size={18} />}
-                </button>
-              ))}
+            {availableCategories(state, type).map((c, i) => (
+              <button
+                key={c}
+                onClick={() => {
+                  setCategory(c);
+                  setPicker(null);
+                }}
+              >
+                <CategoryIcon category={c} index={i} />
+                {c}
+                {category === c && <Check size={18} />}
+              </button>
+            ))}
           </div>
         ) : picker === "wallet" ? (
           <div className="picker-list">

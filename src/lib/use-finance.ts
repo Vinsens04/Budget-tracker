@@ -14,46 +14,79 @@ export function useFinance() {
   const [user, setUser] = useState<User | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [offline, setOffline] = useState(false);
   const revision = useRef(0);
   const locked = useRef(false);
   const userRef = useRef<User | null>(null);
   const stateRef = useRef<FinanceState | null>(null);
-  const load = useCallback(async (nextUser: User | null) => {
-    userRef.current = nextUser;
-    setUser(nextUser);
-    setState(null);
-    stateRef.current = null;
-    setError("");
-    if (!nextUser || !supabase) {
-      const demo = seedState();
-      stateRef.current = demo;
-      setState(demo);
-      return;
-    }
-    const { data, error } = await supabase
-      .from("finance_workspaces")
-      .select("state,revision")
-      .eq("user_id", nextUser.id)
-      .maybeSingle();
-    if (userRef.current?.id !== nextUser.id) return;
-    if (error) {
-      setError(
-        "Your finances could not be loaded. Check the Supabase setup and try again.",
-      );
-      return;
-    }
-    const loaded = data?.state as FinanceState | undefined;
-    revision.current = data?.revision ?? 0;
-    const base =
-      loaded ??
-      emptyState(
-        nextUser.user_metadata.full_name ||
-          nextUser.email?.split("@")[0] ||
-          "Friend",
-      );
-    stateRef.current = base;
-    setState(base);
-  }, []);
+  const refreshing = useRef(false);
+  const load = useCallback(
+    async (nextUser: User | null, quiet = false, afterConflict = false) => {
+      if (
+        quiet &&
+        ((!afterConflict && locked.current) || refreshing.current || !nextUser)
+      )
+        return;
+      refreshing.current = true;
+      const startedRevision = revision.current;
+      userRef.current = nextUser;
+      setUser(nextUser);
+      if (!quiet) {
+        setState(null);
+        stateRef.current = null;
+        setError("");
+      }
+      if (!nextUser || !supabase) {
+        const demo = seedState();
+        stateRef.current = demo;
+        setState(demo);
+        revision.current = 0;
+        refreshing.current = false;
+        return;
+      }
+      const { data, error } = await supabase
+        .from("finance_workspaces")
+        .select("state,revision")
+        .eq("user_id", nextUser.id)
+        .abortSignal(AbortSignal.timeout(20000))
+        .maybeSingle();
+      refreshing.current = false;
+      if (userRef.current?.id !== nextUser.id) return;
+      if (
+        quiet &&
+        ((!afterConflict && locked.current) ||
+          revision.current !== startedRevision)
+      )
+        return;
+      if (error) {
+        setError(
+          "Your finances could not be loaded. Check your connection and try again.",
+        );
+        return;
+      }
+      const loaded = data?.state as FinanceState | undefined;
+      if (
+        quiet &&
+        ((!data && revision.current === 0) ||
+          data?.revision === revision.current)
+      ) {
+        setError("");
+        return;
+      }
+      revision.current = data?.revision ?? 0;
+      const base =
+        loaded ??
+        emptyState(
+          nextUser.user_metadata.full_name ||
+            nextUser.email?.split("@")[0] ||
+            "Friend",
+        );
+      stateRef.current = base;
+      setState(base);
+      setError("");
+    },
+    [],
+  );
   useEffect(() => {
     if (!supabase) {
       void load(null);
@@ -65,45 +98,84 @@ export function useFinance() {
     });
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       if ((session?.user.id ?? null) !== (userRef.current?.id ?? null))
-        void load(session?.user ?? null);
+        setTimeout(() => void load(session?.user ?? null), 0);
     });
     return () => data.subscription.unsubscribe();
   }, [load]);
-  const commit = useCallback(async (next: FinanceState) => {
-    if (locked.current)
-      throw new Error(
-        "A change is still saving. Please try again in a moment.",
-      );
-    locked.current = true;
-    setBusy(true);
-    try {
-      const currentUser = userRef.current;
-      if (currentUser && supabase) {
-        const { data, error } = await supabase.rpc("save_finance_workspace", {
-          new_state: next,
-          expected_revision: revision.current,
-        });
-        if (error)
-          throw new Error(
-            error.code === "40001"
-              ? "Your finances changed in another tab. Reload before saving again."
-              : "We could not save this change. Please try again.",
-          );
-        if (userRef.current?.id !== currentUser.id) return;
-        revision.current = Number(data);
+  useEffect(() => {
+    const reconnect = () => {
+      setOffline(!navigator.onLine);
+      if (navigator.onLine && document.visibilityState === "visible")
+        void load(userRef.current, true);
+    };
+    setOffline(!navigator.onLine);
+    window.addEventListener("online", reconnect);
+    window.addEventListener("offline", reconnect);
+    window.addEventListener("focus", reconnect);
+    document.addEventListener("visibilitychange", reconnect);
+    const interval = setInterval(reconnect, 60000);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("online", reconnect);
+      window.removeEventListener("offline", reconnect);
+      window.removeEventListener("focus", reconnect);
+      document.removeEventListener("visibilitychange", reconnect);
+    };
+  }, [load]);
+  const commit = useCallback(
+    async (next: FinanceState, base = stateRef.current) => {
+      if (base !== stateRef.current)
+        throw new Error(
+          "Your finances have refreshed. Review your change and save again.",
+        );
+      if (locked.current)
+        throw new Error(
+          "A change is still saving. Please try again in a moment.",
+        );
+      locked.current = true;
+      setBusy(true);
+      try {
+        const currentUser = userRef.current;
+        if (currentUser && supabase) {
+          if (!navigator.onLine)
+            throw new Error(
+              "You’re offline. Reconnect, then save again. Your form is still here.",
+            );
+          const { data, error } = await supabase
+            .rpc("save_finance_workspace", {
+              new_state: next,
+              expected_revision: revision.current,
+            })
+            .abortSignal(AbortSignal.timeout(20000));
+          if (error) {
+            const conflict = ["40001", "23505"].includes(error.code);
+            if (conflict) await load(currentUser, true, true);
+            throw new Error(
+              conflict
+                ? "Your finances changed elsewhere. The latest data is loaded; review your change and save again."
+                : "We could not save this change. Please try again.",
+            );
+          }
+          if (userRef.current?.id !== currentUser.id)
+            throw new Error(
+              "Your account changed. Sign in again before saving.",
+            );
+          revision.current = Number(data);
+        }
+        stateRef.current = next;
+        setState(next);
+      } finally {
+        locked.current = false;
+        setBusy(false);
       }
-      stateRef.current = next;
-      setState(next);
-    } finally {
-      locked.current = false;
-      setBusy(false);
-    }
-  }, []);
+    },
+    [load],
+  );
   useEffect(() => {
     if (!state) return;
     const scheduled = processRecurring(state, today());
     if (JSON.stringify(scheduled) !== JSON.stringify(state))
-      void commit(scheduled).catch((e) => setError(e.message));
+      void commit(scheduled, state).catch((e) => setError(e.message));
   }, [state, commit]);
   useEffect(() => {
     if (!state) return;
@@ -124,6 +196,7 @@ export function useFinance() {
     user,
     busy,
     error,
+    offline,
     commit,
     reload: () => load(userRef.current),
     configured: !!supabase,
