@@ -1,7 +1,7 @@
-/* Expressive headings, squared digital figures and quiet interface text. */
+/* Reference typography: wide Syne headings and figures, DM Sans utilities. */
 :root,
 body {
-  font-family: var(--font-jakarta), sans-serif;
+  font-family: var(--font-interface), sans-serif;
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -21,7 +21,7 @@ h3,
   font-optical-sizing: auto;
 }
 .recharts-text {
-  font-family: var(--font-jakarta), sans-serif;
+  font-family: var(--font-interface), sans-serif;
 }
 .page-heading h1 {
   font-weight: 700;
@@ -33,11 +33,11 @@ h2,
 h3,
 .card-heading h2,
 .sheet-header h2 {
-  font-weight: 650;
-  letter-spacing: -0.015em;
+  font-weight: 700;
+  letter-spacing: -0.035em;
 }
 .card-heading h2 {
-  font-size: 18px;
+  font-size: 17px;
 }
 .brand,
 .workspace-wordmark {
@@ -65,7 +65,7 @@ h3,
 .detail-list strong,
 .chart-tooltip-row > strong,
 .calendar-total strong {
-  font-family: var(--font-figures), sans-serif;
+  font-family: var(--font-interface), sans-serif;
   font-variant-numeric: lining-nums tabular-nums;
 }
 .balance-value,
@@ -75,26 +75,27 @@ h3,
 .donut-label strong,
 .detail-amount,
 .chart-tooltip-amount {
-  font-weight: 500;
-  letter-spacing: -0.025em;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.055em;
 }
 .balance-value {
-  font-size: clamp(35px, 3.4vw, 51px);
+  font-size: clamp(35px, 3.4vw, 54px);
 }
 .stat > strong {
   font-weight: 650;
   letter-spacing: -0.015em;
 }
 .budget-number small {
-  font-family: var(--font-jakarta), sans-serif;
+  font-family: var(--font-interface), sans-serif;
   font-weight: 400;
   letter-spacing: 0;
 }
 .balance-bottom strong,
 .transaction-amount strong,
 .wallet-pills button strong {
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 500;
+  letter-spacing: -0.025em;
 }
 .nav-item {
   font-size: 12px;
@@ -118,7 +119,7 @@ h3,
   color: var(--blue);
 }
 .balance-title {
-  letter-spacing: 0.07em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   font-size: 10px;
 }

@@ -366,7 +366,27 @@ export default function BudgetApp() {
       <div className="budget-number">
         {money(summary.expense)} <small>of {money(budgetTotal)}</small>
       </div>
-      <Progress value={used} />
+      <div
+        className="budget-meter"
+        role="progressbar"
+        aria-label="Budget used"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(Math.max(0, Math.min(100, used)))}
+        aria-valuetext={`${Math.round(used)}% used`}
+      >
+        {Array.from({ length: 24 }, (_, index) => (
+          <span
+            key={index}
+            className={
+              index < Math.ceil((Math.max(0, Math.min(100, used)) * 24) / 100)
+                ? "used"
+                : undefined
+            }
+            aria-hidden="true"
+          />
+        ))}
+      </div>
       <div className="budget-foot">
         <span>{Math.round(used)}% used</span>
         <span>
@@ -875,7 +895,8 @@ export default function BudgetApp() {
                         {hidden ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
                       <span className="balance-wallets">
-                        <WalletIcon size={14} /> {state.wallets.length} wallets
+                        Across {state.wallets.length}{" "}
+                        {state.wallets.length === 1 ? "wallet" : "wallets"}
                       </span>
                     </div>
                     <div className="balance-value">
@@ -899,12 +920,6 @@ export default function BudgetApp() {
                             }
                             onClick={() => select("Wallets")}
                           >
-                            <span
-                              className="wallet-pill-mark"
-                              aria-hidden="true"
-                            >
-                              {w.name.slice(0, 1)}
-                            </span>
                             <span className="wallet-pill-name">{w.name}</span>
                             <strong>
                               {hidden

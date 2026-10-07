@@ -109,7 +109,7 @@ h3,
 .nav-item {
   position: relative;
   isolation: isolate;
-  border-radius: 11px;
+  border-radius: 6px;
   padding: 12px 14px;
   margin-bottom: 5px;
 }
@@ -131,7 +131,7 @@ h3,
 .nav-selection {
   position: absolute;
   inset: 0;
-  border-radius: 11px;
+  border-radius: 6px;
   background: var(--selection-bg);
   z-index: -1;
 }
@@ -251,8 +251,8 @@ main {
   color: var(--blue);
 }
 .month-control {
-  border-radius: 10px;
-  background: var(--surface);
+  border-radius: 6px;
+  background: transparent;
   min-height: 44px;
 }
 .month-control button {
@@ -260,9 +260,9 @@ main {
 }
 .card {
   padding: 24px;
-  border-radius: 18px;
-  border-color: color-mix(in srgb, var(--divider) 75%, transparent);
-  box-shadow: var(--surface-shadow);
+  border-radius: 10px;
+  border-color: var(--divider);
+  box-shadow: none;
   margin-bottom: 20px;
 }
 .card-heading {
@@ -313,34 +313,24 @@ main {
   margin: 12px 0 20px;
   line-height: 1.16;
 }
+/* Compact account tags follow the reference receipt card. */
 .wallet-pills {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  padding-bottom: 23px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding-bottom: 26px;
 }
 .wallet-pills button {
-  display: grid;
-  grid-template-columns: 22px minmax(0, 1fr);
-  gap: 4px 7px;
-  padding: 9px;
-  border: 1px solid color-mix(in srgb, var(--hero-text) 13%, transparent);
-  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 9px;
+  border: 1px solid color-mix(in srgb, var(--hero-text) 18%, transparent);
+  border-radius: 4px;
   min-width: 0;
+  min-height: 28px;
+  max-width: 100%;
   text-align: left;
-  min-height: 59px;
-}
-.wallet-pill-mark {
-  width: 22px;
-  height: 22px;
-  background: color-mix(in srgb, var(--hero-text) 10%, transparent);
-  border-radius: 6px;
-  grid-row: span 2;
-  align-self: center;
-  display: grid;
-  place-items: center;
-  color: var(--hero-text);
-  font-size: 10px;
 }
 .wallet-pill-name {
   overflow: hidden;
@@ -350,10 +340,9 @@ main {
 }
 .wallet-pills button strong {
   color: var(--hero-text);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   white-space: nowrap;
-  letter-spacing: -0.015em;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -378,7 +367,7 @@ main {
   margin-bottom: 5px;
 }
 .summary-icon {
-  border-radius: 10px;
+  border-radius: 5px;
   width: 36px;
   height: 36px;
 }
@@ -405,11 +394,14 @@ main {
   margin: 12px 0 23px;
 }
 .monthly-budget .budget-number {
-  display: block;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 6px;
 }
 .budget-number small {
-  display: block;
-  margin: 7px 0 0;
+  display: inline;
+  margin: 0;
   font-size: 12px;
   color: var(--secondary);
 }
@@ -437,10 +429,10 @@ main {
   font-size: 10px;
 }
 .segmented {
-  padding: 3px;
-  border-radius: 9px;
-  background: var(--subtle);
-  border: 0;
+  padding: 0;
+  border-radius: 5px;
+  background: transparent;
+  border: 1px solid var(--divider);
 }
 .segmented button {
   border-radius: 6px;
@@ -449,7 +441,7 @@ main {
   min-height: 29px;
 }
 .segmented-pill {
-  background: var(--surface);
+  background: var(--blue-soft);
   border: 1px solid color-mix(in srgb, var(--divider) 70%, transparent);
   border-radius: 6px;
   box-shadow: 0 2px 4px #00000006;
@@ -555,7 +547,7 @@ main {
 .goal-icon,
 .category-icon,
 .report-icon {
-  border-radius: 11px;
+  border-radius: 6px;
 }
 .report-link {
   border-radius: 15px;
@@ -752,7 +744,7 @@ input::placeholder {
   .bottom-nav {
     background: var(--sidebar-bg);
     border-color: var(--divider);
-    border-radius: 20px;
+    border-radius: 10px;
     padding: 9px 7px;
     box-shadow: 0 12px 35px #00000024;
   }
@@ -760,7 +752,7 @@ input::placeholder {
     color: var(--sidebar-text);
     position: relative;
     isolation: isolate;
-    border-radius: 13px;
+    border-radius: 6px;
   }
   .bottom-nav button.active {
     color: var(--blue);
@@ -769,14 +761,14 @@ input::placeholder {
     position: absolute;
     inset: 0 3px;
     background: var(--selection-bg);
-    border-radius: 13px;
+    border-radius: 6px;
     z-index: -1;
   }
   .bottom-nav button:active {
     transform: none;
   }
   .bottom-nav .add-nav > svg {
-    border-radius: 13px;
+    border-radius: 6px;
   }
 }
 @media (max-width: 650px) {
@@ -843,7 +835,7 @@ input::placeholder {
   }
   .card {
     padding: 20px;
-    border-radius: 17px;
+    border-radius: 8px;
     margin-bottom: 17px;
   }
   .balance-card {
@@ -868,10 +860,9 @@ input::placeholder {
     padding-bottom: 21px;
   }
   .wallet-pills button {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 5px;
-    padding: 8px;
-    min-height: 52px;
+    gap: 6px;
+    padding: 6px 8px;
+    min-height: 28px;
   }
   .wallet-pill-mark {
     display: none;
@@ -887,7 +878,7 @@ input::placeholder {
     font-size: 15px;
   }
   .balance-bottom small {
-    font-size: 9px;
+    font-size: 10px;
   }
   .balance-bottom::before {
     left: -30px;
@@ -903,16 +894,16 @@ input::placeholder {
     height: 28px;
   }
   .monthly-budget .card-heading {
-    margin-bottom: 13px;
+    margin-bottom: 25px;
   }
   .monthly-budget .budget-number {
-    font-size: 28px;
-    margin: 10px 0 18px;
+    font-size: 25px;
+    margin: 6px 0 18px;
   }
   .monthly-budget .budget-number small {
-    display: block;
+    display: inline;
     font-size: 11px;
-    margin: 5px 0 0;
+    margin: 0;
   }
   .monthly-budget > .progress {
     height: 7px;

@@ -6,22 +6,16 @@ import "./themes.css";
 import "./studio.css";
 import "./typography.css";
 import { themeInitScript } from "@/lib/themes";
-const jakarta = localFont({
-  src: "./fonts/plus-jakarta-sans.woff2",
-  variable: "--font-jakarta",
-  weight: "400 800",
-  display: "swap",
-});
-const figures = localFont({
-  src: "./fonts/oxanium.woff2",
-  variable: "--font-figures",
+const interfaceFont = localFont({
+  src: "../../public/fonts/dm-sans.woff2",
+  variable: "--font-interface",
   weight: "400 700",
   display: "swap",
 });
 const display = localFont({
-  src: "./fonts/bricolage-grotesque.woff2",
+  src: "../../public/fonts/syne.woff2",
   variable: "--font-display",
-  weight: "400 800",
+  weight: "500 800",
   display: "swap",
 });
 export const metadata: Metadata = {
@@ -41,7 +35,7 @@ export default function Layout({
   return (
     <html
       lang="en"
-      className={`${jakarta.variable} ${figures.variable} ${display.variable}`}
+      className={`${interfaceFont.variable} ${display.variable}`}
       data-theme="dark"
       data-palette="green"
       suppressHydrationWarning
