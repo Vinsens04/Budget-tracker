@@ -1,4 +1,6 @@
 "use client";
+import { useMemo } from "react";
+import { useReducedMotion } from "motion/react";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -79,11 +81,16 @@ export function SpendingChart({
   period: Period;
   month: string;
 }) {
+  const reduced = useReducedMotion();
+  const data = useMemo(
+    () => timeline(transactions, period, month),
+    [transactions, period, month],
+  );
   return (
     <div className="area-chart">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart
-          data={timeline(transactions, period, month)}
+          data={data}
           margin={{ top: 12, right: 10, left: -20, bottom: 0 }}
         >
           <defs>
@@ -127,7 +134,9 @@ export function SpendingChart({
             stroke="#007aff"
             strokeWidth={2.5}
             fill="url(#spendingFill)"
-            isAnimationActive={false}
+            isAnimationActive={reduced === false}
+            animationDuration={450}
+            animationEasing="ease-out"
           />
         </AreaChart>
       </ResponsiveContainer>
@@ -139,7 +148,8 @@ export function CategoryChart({
 }: {
   transactions: Transaction[];
 }) {
-  const data = categoryTotals(transactions);
+  const reduced = useReducedMotion();
+  const data = useMemo(() => categoryTotals(transactions), [transactions]);
   const total = data.reduce((n, c) => n + c.value, 0);
   return (
     <div className="donut">
@@ -157,7 +167,9 @@ export function CategoryChart({
             paddingAngle={data.length > 1 ? 4 : 0}
             cornerRadius={5}
             stroke="none"
-            isAnimationActive={false}
+            isAnimationActive={reduced === false}
+            animationDuration={450}
+            animationEasing="ease-out"
           >
             {(data.length ? data : [{ color: "#e9e9ed" }]).map((c, i) => (
               <Cell key={i} fill={c.color} />
@@ -182,10 +194,15 @@ export function ComparisonChart({
   period: Period;
   month: string;
 }) {
+  const reduced = useReducedMotion();
+  const data = useMemo(
+    () => timeline(transactions, period, month),
+    [transactions, period, month],
+  );
   return (
     <div className="area-chart">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={timeline(transactions, period, month)}>
+        <BarChart data={data}>
           <XAxis
             dataKey="label"
             minTickGap={30}
@@ -207,14 +224,18 @@ export function ComparisonChart({
             name="Income"
             fill="#34c759"
             radius={[4, 4, 0, 0]}
-            isAnimationActive={false}
+            isAnimationActive={reduced === false}
+            animationDuration={450}
+            animationEasing="ease-out"
           />
           <Bar
             dataKey="expense"
             name="Expenses"
             fill="#007aff"
             radius={[4, 4, 0, 0]}
-            isAnimationActive={false}
+            isAnimationActive={reduced === false}
+            animationDuration={450}
+            animationEasing="ease-out"
           />
         </BarChart>
       </ResponsiveContainer>

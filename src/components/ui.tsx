@@ -1,6 +1,11 @@
 "use client";
-import { useEffect, useRef, cloneElement, isValidElement } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useEffect, useRef, useId, cloneElement, isValidElement } from "react";
+import {
+  AnimatePresence,
+  LayoutGroup,
+  motion,
+  useReducedMotion,
+} from "motion/react";
 import {
   X,
   Coffee,
@@ -47,18 +52,28 @@ export function CategoryIcon({
   );
 }
 export function Progress({ value, color }: { value: number; color?: string }) {
+  const reduced = useReducedMotion();
   return (
     <div
       className="progress"
       role="progressbar"
-      aria-valuenow={Math.round(value)}
+      aria-valuenow={Math.round(Math.min(100, Math.max(0, value)))}
+      aria-valuetext={`${Math.round(value)}% used`}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label="Budget used"
     >
-      <span
+      <motion.span
+        initial={reduced ? false : { scaleX: 0 }}
+        animate={{ scaleX: Math.max(0, Math.min(100, value)) / 100 }}
+        transition={
+          reduced
+            ? { duration: 0 }
+            : { type: "spring", stiffness: 150, damping: 25, mass: 0.65 }
+        }
         style={{
-          width: `${Math.max(0, Math.min(100, value))}%`,
+          width: "100%",
+          transformOrigin: "left center",
           background:
             color ??
             (value >= 90 ? "#ff3b30" : value > 70 ? "#ff9500" : "#007aff"),
@@ -76,20 +91,35 @@ export function Segmented<T extends string>({
   value: T;
   onChange: (value: T) => void;
 }) {
+  const group = useId();
+  const reduced = useReducedMotion();
   return (
-    <div className="segmented">
-      {options.map((option) => (
-        <button
-          key={option}
-          type="button"
-          aria-pressed={value === option}
-          className={value === option ? "selected" : ""}
-          onClick={() => onChange(option)}
-        >
-          {option}
-        </button>
-      ))}
-    </div>
+    <LayoutGroup id={group}>
+      <div className="segmented">
+        {options.map((option) => (
+          <button
+            key={option}
+            type="button"
+            aria-pressed={value === option}
+            className={value === option ? "selected" : ""}
+            onClick={() => onChange(option)}
+          >
+            {value === option && (
+              <motion.span
+                className="segmented-pill"
+                layoutId="selection"
+                transition={
+                  reduced
+                    ? { duration: 0 }
+                    : { type: "spring", stiffness: 450, damping: 38 }
+                }
+              />
+            )}
+            <span className="segmented-label">{option}</span>
+          </button>
+        ))}
+      </div>
+    </LayoutGroup>
   );
 }
 export function TransactionList({
@@ -101,38 +131,50 @@ export function TransactionList({
   onSelect: (t: Transaction) => void;
   walletNames: Record<string, string>;
 }) {
+  const reduced = useReducedMotion();
   return items.length ? (
     <div className="transaction-list">
-      {items.map((t) => (
-        <button key={t.id} className="transaction" onClick={() => onSelect(t)}>
-          <CategoryIcon
-            category={t.category}
-            index={
-              t.type === "income"
-                ? 5
-                : Object.keys(categoryIcons).indexOf(t.category)
-            }
-          />
-          <span className="transaction-copy">
-            <strong>{t.name}</strong>
-            <small>
-              {t.category} <span className="dot">·</span>{" "}
-              {walletNames[t.wallet]}
-            </small>
-          </span>
-          <span className="transaction-amount">
-            <strong className={t.type === "income" ? "positive" : ""}>
-              {t.type === "income" ? "+" : "−"} {money(t.amount)}
-            </strong>
-            <small>
-              {new Date(t.date + "T12:00:00").toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short",
-              })}
-            </small>
-          </span>
-        </button>
-      ))}
+      <AnimatePresence initial={false} mode="popLayout">
+        {items.map((t) => (
+          <motion.button
+            key={t.id}
+            layout={reduced ? false : "position"}
+            initial={{ opacity: 0, y: reduced ? 0 : 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: reduced ? 0 : -4 }}
+            transition={{ type: "spring", bounce: 0, duration: 0.26 }}
+            className="transaction"
+            onClick={() => onSelect(t)}
+          >
+            <CategoryIcon
+              category={t.category}
+              index={
+                t.type === "income"
+                  ? 5
+                  : Object.keys(categoryIcons).indexOf(t.category)
+              }
+            />
+            <span className="transaction-copy">
+              <strong>{t.name}</strong>
+              <small>
+                {t.category} <span className="dot">·</span>{" "}
+                {walletNames[t.wallet]}
+              </small>
+            </span>
+            <span className="transaction-amount">
+              <strong className={t.type === "income" ? "positive" : ""}>
+                {t.type === "income" ? "+" : "−"} {money(t.amount)}
+              </strong>
+              <small>
+                {new Date(t.date + "T12:00:00").toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                })}
+              </small>
+            </span>
+          </motion.button>
+        ))}
+      </AnimatePresence>
     </div>
   ) : (
     <div className="empty">

@@ -1,6 +1,13 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
 import {
+  AnimatePresence,
+  MotionConfig,
+  motion,
+  useReducedMotion,
+} from "motion/react";
+import { AnimatedAmount } from "./animated-amount";
+import {
   Wallet as WalletIcon,
   LayoutDashboard,
   ArrowLeftRight,
@@ -91,6 +98,14 @@ const navigation: { name: Page; icon: LucideIcon }[] = [
   { name: "Analytics", icon: ChartNoAxesCombined },
   { name: "Saving goals", icon: Target },
 ];
+const surfaceVariants = {
+  hidden: (reduced: boolean) => ({ opacity: 0, y: reduced ? 0 : 10 }),
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring" as const, bounce: 0, duration: 0.34 },
+  },
+};
 type Editor =
   | { kind: "budget"; item?: Budget }
   | { kind: "wallet"; item?: Wallet }
@@ -117,6 +132,7 @@ function download(name: string, text: string, type = "application/json") {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 export default function BudgetApp() {
+  const reduced = useReducedMotion();
   const { state, user, busy, error, commit, reload, configured } = useFinance();
   const [page, setPage] = useState<Page>("Overview");
   const [month, setMonth] = useState(today().slice(0, 7));
@@ -254,7 +270,11 @@ export default function BudgetApp() {
     setEditing(undefined);
   };
   const budgetCard = (
-    <section className="card monthly-budget">
+    <motion.section
+      variants={surfaceVariants}
+      custom={!!reduced}
+      className="card monthly-budget"
+    >
       <div className="card-heading">
         <h2>Monthly budget</h2>
         <button
@@ -288,10 +308,14 @@ export default function BudgetApp() {
                 ? "Keep an eye on spending"
                 : "Comfortably within your budget"}
       </div>
-    </section>
+    </motion.section>
   );
   const spendingCard = (
-    <section className="card spending-card">
+    <motion.section
+      variants={surfaceVariants}
+      custom={!!reduced}
+      className="card spending-card"
+    >
       <div className="card-heading">
         <div>
           <h2>Spending overview</h2>
@@ -339,10 +363,14 @@ export default function BudgetApp() {
         period={period}
         month={month}
       />
-    </section>
+    </motion.section>
   );
   const goalsCard = (
-    <section className="card">
+    <motion.section
+      variants={surfaceVariants}
+      custom={!!reduced}
+      className="card"
+    >
       <div className="card-heading">
         <h2>Saving for something</h2>
         <button className="text-button" onClick={() => select("Saving goals")}>
@@ -383,10 +411,14 @@ export default function BudgetApp() {
           </button>
         </div>
       )}
-    </section>
+    </motion.section>
   );
   const categoryCard = (
-    <section className="card categories-card">
+    <motion.section
+      variants={surfaceVariants}
+      custom={!!reduced}
+      className="card categories-card"
+    >
       <div className="card-heading">
         <h2>Where it went</h2>
         <button
@@ -417,10 +449,14 @@ export default function BudgetApp() {
           Your categories will appear after your first expense.
         </p>
       )}
-    </section>
+    </motion.section>
   );
   const insight = (
-    <section className="insight">
+    <motion.section
+      variants={surfaceVariants}
+      custom={!!reduced}
+      className="insight"
+    >
       <span className="insight-icon">
         <Sparkles size={22} />
       </span>
@@ -432,7 +468,7 @@ export default function BudgetApp() {
             : "Add your income to see how much you’re putting aside."}
         </p>
       </div>
-    </section>
+    </motion.section>
   );
   const filtered = state.transactions
     .filter(
@@ -452,1271 +488,1410 @@ export default function BudgetApp() {
     .sort((a, b) => b.date.localeCompare(a.date));
   const grouped = groupByDate(filtered);
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <a
-          className="brand"
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            select("Overview");
-          }}
-        >
-          <span className="brand-mark">
-            <WalletIcon size={23} />
-          </span>
-          saldo<span className="brand-period">.</span>
-        </a>
-        <div className="sidebar-label">YOUR FINANCES</div>
-        <nav aria-label="Main navigation">
-          {navigation.map(({ name, icon: Icon }) => (
-            <button
-              className={`nav-item ${page === name ? "active" : ""}`}
-              key={name}
-              onClick={() => select(name)}
-            >
-              <Icon size={20} strokeWidth={1.8} />
-              {name}
-            </button>
-          ))}
-        </nav>
-        <div className="sidebar-label tools-label">A LITTLE MORE CLARITY</div>
-        <nav aria-label="More tools">
-          {(
-            [
-              { name: "Recurring", icon: Repeat },
-              { name: "Calendar", icon: CalendarDays },
-              { name: "Reports", icon: FileChartColumn },
-            ] as { name: Page; icon: LucideIcon }[]
-          ).map(({ name, icon: Icon }) => (
-            <button
-              className={`nav-item ${page === name ? "active" : ""}`}
-              key={name}
-              onClick={() => select(name)}
-            >
-              <Icon size={20} strokeWidth={1.8} />
-              {name}
-            </button>
-          ))}
-        </nav>
-        <div className="sidebar-bottom">
-          <div className="privacy-note">
-            <ShieldCheck size={17} />
-            <span>Your money. Your space.</span>
-          </div>
-          <button className="user-card" onClick={() => select("Profile")}>
-            <span className="avatar">{state.settings.name.slice(0, 1)}</span>
-            <span>
-              <strong>{state.settings.name}</strong>
-              <small>{user ? "Personal account" : "Demo account"}</small>
+    <MotionConfig
+      reducedMotion="user"
+      transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+    >
+      <div className="app-shell">
+        <aside className="sidebar">
+          <a
+            className="brand"
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              select("Overview");
+            }}
+          >
+            <span className="brand-mark">
+              <WalletIcon size={23} />
             </span>
-            <Settings size={17} />
-          </button>
-        </div>
-      </aside>
-      <div className="workspace">
-        <header className="topbar">
-          <div className="breadcrumb">
-            My workspace <ChevronRight size={14} /> <strong>{page}</strong>
-          </div>
-          <div className="topbar-actions">
-            <span className="demo-label">
-              {user ? "Connected account" : "Demo · session only"}
-            </span>
-            <button
-              className="icon-button notification-button"
-              aria-label="Notifications"
-              onClick={() => setNotifications(true)}
-            >
-              <Bell size={20} />
-              {allAlerts.length > 0 && <span />}
-            </button>
-            <button
-              className="avatar small-avatar"
-              aria-label="Open profile"
-              onClick={() => select("Profile")}
-            >
-              {state.settings.name.slice(0, 1)}
-            </button>
-          </div>
-        </header>
-        <main>
-          <div className="page-heading">
-            <div>
-              {page === "Overview" ? (
-                <>
-                  <p className="eyebrow">YOUR MONEY, A LITTLE CLEARER</p>
-                  <h1>
-                    Hello, {state.settings.name}
-                    <span className="greeting-dot">.</span>
-                  </h1>
-                  <p>Make room for what matters.</p>
-                </>
-              ) : (
-                <>
-                  <p className="eyebrow">YOUR PERSONAL FINANCES</p>
-                  <h1>{page}</h1>
-                  <p>
-                    {
-                      (
-                        {
-                          Transactions: "The little things, all in one place.",
-                          Budgets: "Give every Rupiah a little direction.",
-                          Wallets: "All your accounts. One clear picture.",
-                          Analytics: "Find the patterns behind your spending.",
-                          "Saving goals":
-                            "Small steps toward the things you love.",
-                          Recurring: "A rhythm for your regular payments.",
-                          Calendar: "Your finances, day by day.",
-                          Reports: "A thoughtful look at your month.",
-                          Profile: "Make this space your own.",
-                        } as Record<string, string>
-                      )[page]
-                    }
-                  </p>
-                </>
-              )}
+            saldo<span className="brand-period">.</span>
+          </a>
+          <div className="sidebar-label">YOUR FINANCES</div>
+          <nav aria-label="Main navigation">
+            {navigation.map(({ name, icon: Icon }) => (
+              <button
+                className={`nav-item ${page === name ? "active" : ""}`}
+                key={name}
+                onClick={() => select(name)}
+              >
+                <Icon size={20} strokeWidth={1.8} />
+                {name}
+              </button>
+            ))}
+          </nav>
+          <div className="sidebar-label tools-label">A LITTLE MORE CLARITY</div>
+          <nav aria-label="More tools">
+            {(
+              [
+                { name: "Recurring", icon: Repeat },
+                { name: "Calendar", icon: CalendarDays },
+                { name: "Reports", icon: FileChartColumn },
+              ] as { name: Page; icon: LucideIcon }[]
+            ).map(({ name, icon: Icon }) => (
+              <button
+                className={`nav-item ${page === name ? "active" : ""}`}
+                key={name}
+                onClick={() => select(name)}
+              >
+                <Icon size={20} strokeWidth={1.8} />
+                {name}
+              </button>
+            ))}
+          </nav>
+          <div className="sidebar-bottom">
+            <div className="privacy-note">
+              <ShieldCheck size={17} />
+              <span>Your money. Your space.</span>
             </div>
-            <div className="heading-actions">
-              {!["Profile", "Saving goals", "Wallets", "Recurring"].includes(
-                page,
-              ) && (
-                <div className="month-control">
-                  <button
-                    aria-label="Previous month"
-                    onClick={() => setMonth(offsetMonth(month, -1))}
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  <span>
-                    <CalendarDays size={16} />
-                    {monthLabel(month)}
-                  </span>
-                  <button
-                    aria-label="Next month"
-                    onClick={() => setMonth(offsetMonth(month, 1))}
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
-              )}
-              {page === "Overview" || page === "Transactions" ? (
-                <button
-                  className="primary desktop-add"
-                  onClick={() => {
-                    setEditing(undefined);
-                    setAdding(true);
-                  }}
-                >
-                  <Plus size={18} />
-                  Add transaction
-                </button>
-              ) : ["Budgets", "Wallets", "Saving goals", "Recurring"].includes(
+            <button className="user-card" onClick={() => select("Profile")}>
+              <span className="avatar">{state.settings.name.slice(0, 1)}</span>
+              <span>
+                <strong>{state.settings.name}</strong>
+                <small>{user ? "Personal account" : "Demo account"}</small>
+              </span>
+              <Settings size={17} />
+            </button>
+          </div>
+        </aside>
+        <div className="workspace">
+          <header className="topbar">
+            <div className="breadcrumb">
+              My workspace <ChevronRight size={14} /> <strong>{page}</strong>
+            </div>
+            <div className="topbar-actions">
+              <span className="demo-label">
+                {user ? "Connected account" : "Demo · session only"}
+              </span>
+              <button
+                className="icon-button notification-button"
+                aria-label="Notifications"
+                onClick={() => setNotifications(true)}
+              >
+                <Bell size={20} />
+                {allAlerts.length > 0 && <span />}
+              </button>
+              <button
+                className="avatar small-avatar"
+                aria-label="Open profile"
+                onClick={() => select("Profile")}
+              >
+                {state.settings.name.slice(0, 1)}
+              </button>
+            </div>
+          </header>
+          <motion.main
+            key={page}
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: {
+                opacity: 1,
+                transition: {
+                  duration: 0.12,
+                  delayChildren: 0.02,
+                  staggerChildren: reduced ? 0 : 0.045,
+                },
+              },
+            }}
+          >
+            <div className="page-heading">
+              <div>
+                {page === "Overview" ? (
+                  <>
+                    <p className="eyebrow">YOUR MONEY, A LITTLE CLEARER</p>
+                    <h1>
+                      Hello, {state.settings.name}
+                      <span className="greeting-dot">.</span>
+                    </h1>
+                    <p>Make room for what matters.</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="eyebrow">YOUR PERSONAL FINANCES</p>
+                    <h1>{page}</h1>
+                    <p>
+                      {
+                        (
+                          {
+                            Transactions:
+                              "The little things, all in one place.",
+                            Budgets: "Give every Rupiah a little direction.",
+                            Wallets: "All your accounts. One clear picture.",
+                            Analytics:
+                              "Find the patterns behind your spending.",
+                            "Saving goals":
+                              "Small steps toward the things you love.",
+                            Recurring: "A rhythm for your regular payments.",
+                            Calendar: "Your finances, day by day.",
+                            Reports: "A thoughtful look at your month.",
+                            Profile: "Make this space your own.",
+                          } as Record<string, string>
+                        )[page]
+                      }
+                    </p>
+                  </>
+                )}
+              </div>
+              <div className="heading-actions">
+                {!["Profile", "Saving goals", "Wallets", "Recurring"].includes(
                   page,
-                ) ? (
-                <button
-                  className="primary"
-                  onClick={() =>
-                    setEditor({
-                      kind:
-                        page === "Budgets"
-                          ? "budget"
-                          : page === "Wallets"
-                            ? "wallet"
-                            : page === "Saving goals"
-                              ? "goal"
-                              : "recurring",
-                    })
-                  }
-                >
-                  <Plus size={18} />
-                  Create{" "}
-                  {page === "Budgets"
-                    ? "budget"
-                    : page === "Wallets"
-                      ? "wallet"
-                      : page === "Saving goals"
-                        ? "goal"
-                        : "schedule"}
-                </button>
-              ) : null}
-            </div>
-          </div>
-          {page === "Overview" && (
-            <>
-              <div className="summary-grid">
-                <section className="card balance-card">
-                  <div className="balance-top">
-                    <span>Total balance</span>
+                ) && (
+                  <div className="month-control">
                     <button
-                      className="icon-button"
-                      aria-label={hidden ? "Show balance" : "Hide balance"}
-                      onClick={() => setHidden(!hidden)}
+                      aria-label="Previous month"
+                      onClick={() => setMonth(offsetMonth(month, -1))}
                     >
-                      {hidden ? <EyeOff size={18} /> : <Eye size={18} />}
+                      <ChevronLeft size={16} />
                     </button>
-                    <span className="balance-wallets">
-                      Across {state.wallets.length} wallets
-                    </span>
-                  </div>
-                  <div className="balance-value">
-                    {hidden ? "Rp •••••••" : money(balance)}
-                  </div>
-                  <div className="balance-bottom">
-                    <div>
-                      <span className="summary-icon income-icon">
-                        <ArrowDownLeft size={20} />
-                      </span>
-                      <span>
-                        <small>Income this month</small>
-                        <strong>
-                          {hidden ? "•••••" : money(summary.income)}
-                        </strong>
-                      </span>
-                    </div>
-                    <div>
-                      <span className="summary-icon expense-icon">
-                        <ArrowUpRight size={20} />
-                      </span>
-                      <span>
-                        <small>Expenses this month</small>
-                        <strong>
-                          {hidden ? "•••••" : money(summary.expense)}
-                        </strong>
-                      </span>
-                    </div>
-                  </div>
-                </section>
-                {budgetCard}
-              </div>
-              <div className="dashboard-grid">
-                <div className="dashboard-main">
-                  {spendingCard}
-                  <section className="card recent-card">
-                    <div className="card-heading">
-                      <h2>Recent transactions</h2>
-                      <button
-                        className="text-button"
-                        onClick={() => select("Transactions")}
-                      >
-                        See all <ChevronRight size={14} />
-                      </button>
-                    </div>
-                    <TransactionList
-                      items={recent}
-                      onSelect={setSelected}
-                      walletNames={walletNames}
-                    />
-                  </section>
-                  {insight}
-                </div>
-                <div className="dashboard-aside">
-                  {categoryCard}
-                  {goalsCard}
-                  <button
-                    className="report-link"
-                    onClick={() => select("Reports")}
-                  >
-                    <span className="report-icon">
-                      <FileChartColumn size={22} />
-                    </span>
                     <span>
-                      <strong>Your monthly story</strong>
-                      <small>See your financial report</small>
+                      <CalendarDays size={16} />
+                      {monthLabel(month)}
                     </span>
-                    <ChevronRight size={18} />
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
-          {page === "Transactions" && (
-            <>
-              <div className="card filters-card">
-                <div className="filter-row">
-                  <div className="search-input">
-                    <Search size={19} />
-                    <input
-                      aria-label="Search transactions"
-                      placeholder="Search transactions"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                    />
-                  </div>
-                  <Segmented
-                    options={["All", "Expense", "Income"]}
-                    value={filter}
-                    onChange={setFilter}
-                  />
-                  <button
-                    className={`secondary ${showFilters ? "selected" : ""}`}
-                    onClick={() => setShowFilters(!showFilters)}
-                  >
-                    <SlidersHorizontal size={17} />
-                    Filters
-                  </button>
-                </div>
-                {showFilters && (
-                  <div className="filter-fields">
-                    <Field label="Category">
-                      <select
-                        value={categoryFilter}
-                        onChange={(e) => setCategoryFilter(e.target.value)}
-                      >
-                        {["All categories", ...categories].map((c) => (
-                          <option key={c}>{c}</option>
-                        ))}
-                      </select>
-                    </Field>
-                    <Field label="Wallet">
-                      <select
-                        value={walletFilter}
-                        onChange={(e) => setWalletFilter(e.target.value)}
-                      >
-                        <option>All wallets</option>
-                        {state.wallets.map((w) => (
-                          <option key={w.id} value={w.id}>
-                            {w.name}
-                          </option>
-                        ))}
-                      </select>
-                    </Field>
-                    <Field label="Date">
-                      <input
-                        type="date"
-                        value={dateFilter}
-                        onChange={(e) => setDateFilter(e.target.value)}
-                      />
-                    </Field>
-                    <Field label="Min amount">
-                      <input
-                        type="number"
-                        min="0"
-                        value={minAmount}
-                        onChange={(e) => setMinAmount(e.target.value)}
-                      />
-                    </Field>
-                    <Field label="Max amount">
-                      <input
-                        type="number"
-                        min="0"
-                        value={maxAmount}
-                        onChange={(e) => setMaxAmount(e.target.value)}
-                      />
-                    </Field>
                     <button
-                      className="text-button"
-                      onClick={() => {
-                        setCategoryFilter("All categories");
-                        setWalletFilter("All wallets");
-                        setDateFilter("");
-                        setMinAmount("");
-                        setMaxAmount("");
-                      }}
+                      aria-label="Next month"
+                      onClick={() => setMonth(offsetMonth(month, 1))}
                     >
-                      Clear filters
+                      <ChevronRight size={16} />
                     </button>
                   </div>
                 )}
+                {page === "Overview" || page === "Transactions" ? (
+                  <button
+                    className="primary desktop-add"
+                    onClick={() => {
+                      setEditing(undefined);
+                      setAdding(true);
+                    }}
+                  >
+                    <Plus size={18} />
+                    Add transaction
+                  </button>
+                ) : [
+                    "Budgets",
+                    "Wallets",
+                    "Saving goals",
+                    "Recurring",
+                  ].includes(page) ? (
+                  <button
+                    className="primary"
+                    onClick={() =>
+                      setEditor({
+                        kind:
+                          page === "Budgets"
+                            ? "budget"
+                            : page === "Wallets"
+                              ? "wallet"
+                              : page === "Saving goals"
+                                ? "goal"
+                                : "recurring",
+                      })
+                    }
+                  >
+                    <Plus size={18} />
+                    Create{" "}
+                    {page === "Budgets"
+                      ? "budget"
+                      : page === "Wallets"
+                        ? "wallet"
+                        : page === "Saving goals"
+                          ? "goal"
+                          : "schedule"}
+                  </button>
+                ) : null}
               </div>
-              <div className="card">
-                {filtered.length ? (
-                  Object.entries(grouped).map(([date, items]) => (
-                    <div className="date-group" key={date}>
-                      <h3>
-                        {date === today()
-                          ? "Today"
-                          : new Date(date + "T12:00:00").toLocaleDateString(
-                              "en-GB",
-                              {
-                                weekday: "long",
-                                day: "numeric",
-                                month: "long",
-                              },
+            </div>
+            {page === "Overview" && (
+              <>
+                <div className="summary-grid">
+                  <motion.section
+                    variants={surfaceVariants}
+                    custom={!!reduced}
+                    className="card balance-card"
+                  >
+                    <div className="balance-top">
+                      <span>Total balance</span>
+                      <button
+                        className="icon-button"
+                        aria-label={hidden ? "Show balance" : "Hide balance"}
+                        onClick={() => setHidden(!hidden)}
+                      >
+                        {hidden ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                      <span className="balance-wallets">
+                        Across {state.wallets.length} wallets
+                      </span>
+                    </div>
+                    <div className="balance-value">
+                      {hidden ? (
+                        "Rp •••••••"
+                      ) : (
+                        <AnimatedAmount value={balance} />
+                      )}
+                    </div>
+                    <div className="balance-bottom">
+                      <div>
+                        <span className="summary-icon income-icon">
+                          <ArrowDownLeft size={20} />
+                        </span>
+                        <span>
+                          <small>Income this month</small>
+                          <strong>
+                            {hidden ? (
+                              "•••••"
+                            ) : (
+                              <AnimatedAmount value={summary.income} />
                             )}
-                      </h3>
+                          </strong>
+                        </span>
+                      </div>
+                      <div>
+                        <span className="summary-icon expense-icon">
+                          <ArrowUpRight size={20} />
+                        </span>
+                        <span>
+                          <small>Expenses this month</small>
+                          <strong>
+                            {hidden ? (
+                              "•••••"
+                            ) : (
+                              <AnimatedAmount value={summary.expense} />
+                            )}
+                          </strong>
+                        </span>
+                      </div>
+                    </div>
+                  </motion.section>
+                  {budgetCard}
+                </div>
+                <div className="dashboard-grid">
+                  <div className="dashboard-main">
+                    {spendingCard}
+                    <motion.section
+                      variants={surfaceVariants}
+                      custom={!!reduced}
+                      className="card recent-card"
+                    >
+                      <div className="card-heading">
+                        <h2>Recent transactions</h2>
+                        <button
+                          className="text-button"
+                          onClick={() => select("Transactions")}
+                        >
+                          See all <ChevronRight size={14} />
+                        </button>
+                      </div>
                       <TransactionList
-                        items={items ?? []}
+                        items={recent}
                         onSelect={setSelected}
                         walletNames={walletNames}
                       />
+                    </motion.section>
+                    {insight}
+                  </div>
+                  <div className="dashboard-aside">
+                    {categoryCard}
+                    {goalsCard}
+                    <button
+                      className="report-link"
+                      onClick={() => select("Reports")}
+                    >
+                      <span className="report-icon">
+                        <FileChartColumn size={22} />
+                      </span>
+                      <span>
+                        <strong>Your monthly story</strong>
+                        <small>See your financial report</small>
+                      </span>
+                      <ChevronRight size={18} />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+            {page === "Transactions" && (
+              <>
+                <div className="card filters-card">
+                  <div className="filter-row">
+                    <div className="search-input">
+                      <Search size={19} />
+                      <input
+                        aria-label="Search transactions"
+                        placeholder="Search transactions"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                      />
                     </div>
-                  ))
-                ) : (
-                  <TransactionList
-                    items={[]}
-                    onSelect={setSelected}
-                    walletNames={walletNames}
+                    <Segmented
+                      options={["All", "Expense", "Income"]}
+                      value={filter}
+                      onChange={setFilter}
+                    />
+                    <button
+                      className={`secondary ${showFilters ? "selected" : ""}`}
+                      onClick={() => setShowFilters(!showFilters)}
+                    >
+                      <SlidersHorizontal size={17} />
+                      Filters
+                    </button>
+                  </div>
+                  {showFilters && (
+                    <div className="filter-fields">
+                      <Field label="Category">
+                        <select
+                          value={categoryFilter}
+                          onChange={(e) => setCategoryFilter(e.target.value)}
+                        >
+                          {["All categories", ...categories].map((c) => (
+                            <option key={c}>{c}</option>
+                          ))}
+                        </select>
+                      </Field>
+                      <Field label="Wallet">
+                        <select
+                          value={walletFilter}
+                          onChange={(e) => setWalletFilter(e.target.value)}
+                        >
+                          <option>All wallets</option>
+                          {state.wallets.map((w) => (
+                            <option key={w.id} value={w.id}>
+                              {w.name}
+                            </option>
+                          ))}
+                        </select>
+                      </Field>
+                      <Field label="Date">
+                        <input
+                          type="date"
+                          value={dateFilter}
+                          onChange={(e) => setDateFilter(e.target.value)}
+                        />
+                      </Field>
+                      <Field label="Min amount">
+                        <input
+                          type="number"
+                          min="0"
+                          value={minAmount}
+                          onChange={(e) => setMinAmount(e.target.value)}
+                        />
+                      </Field>
+                      <Field label="Max amount">
+                        <input
+                          type="number"
+                          min="0"
+                          value={maxAmount}
+                          onChange={(e) => setMaxAmount(e.target.value)}
+                        />
+                      </Field>
+                      <button
+                        className="text-button"
+                        onClick={() => {
+                          setCategoryFilter("All categories");
+                          setWalletFilter("All wallets");
+                          setDateFilter("");
+                          setMinAmount("");
+                          setMaxAmount("");
+                        }}
+                      >
+                        Clear filters
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div className="card">
+                  {filtered.length ? (
+                    Object.entries(grouped).map(([date, items]) => (
+                      <div className="date-group" key={date}>
+                        <h3>
+                          {date === today()
+                            ? "Today"
+                            : new Date(date + "T12:00:00").toLocaleDateString(
+                                "en-GB",
+                                {
+                                  weekday: "long",
+                                  day: "numeric",
+                                  month: "long",
+                                },
+                              )}
+                        </h3>
+                        <TransactionList
+                          items={items ?? []}
+                          onSelect={setSelected}
+                          walletNames={walletNames}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <TransactionList
+                      items={[]}
+                      onSelect={setSelected}
+                      walletNames={walletNames}
+                    />
+                  )}
+                </div>
+              </>
+            )}
+            {page === "Budgets" && (
+              <>
+                {budgetCard}
+                <div className="management-grid">
+                  {budgets.map((b, i) => {
+                    const spent = monthTx
+                      .filter(
+                        (t) =>
+                          t.type === "expense" && t.category === b.category,
+                      )
+                      .reduce((n, t) => n + t.amount, 0);
+                    const percent = (spent / b.limit) * 100;
+                    return (
+                      <motion.section
+                        variants={surfaceVariants}
+                        custom={!!reduced}
+                        className="card budget-item"
+                        key={b.id}
+                      >
+                        <div className="card-heading">
+                          <CategoryIcon category={b.category} index={i} />
+                          <button
+                            className="icon-button"
+                            aria-label={`Edit ${b.category} budget`}
+                            onClick={() =>
+                              setEditor({ kind: "budget", item: b })
+                            }
+                          >
+                            <Ellipsis size={20} />
+                          </button>
+                        </div>
+                        <h2>{b.category}</h2>
+                        <div className="budget-number">
+                          {money(spent)}
+                          <small>of {money(b.limit)}</small>
+                        </div>
+                        <Progress value={percent} />
+                        <div className="budget-foot">
+                          <span>{Math.round(percent)}% used</span>
+                          <span>Alert at {b.threshold}%</span>
+                        </div>
+                      </motion.section>
+                    );
+                  })}
+                </div>
+                {!budgets.length && (
+                  <Empty
+                    title="A plan for your month"
+                    text="Create your first category budget to start planning."
+                    onClick={() => setEditor({ kind: "budget" })}
+                    label="Create budget"
                   />
                 )}
-              </div>
-            </>
-          )}
-          {page === "Budgets" && (
-            <>
-              {budgetCard}
-              <div className="management-grid">
-                {budgets.map((b, i) => {
-                  const spent = monthTx
-                    .filter(
-                      (t) => t.type === "expense" && t.category === b.category,
-                    )
-                    .reduce((n, t) => n + t.amount, 0);
-                  const percent = (spent / b.limit) * 100;
-                  return (
-                    <section className="card budget-item" key={b.id}>
+              </>
+            )}
+            {page === "Wallets" && (
+              <>
+                <div className="section-toolbar">
+                  <p>
+                    Transfers move money between wallets without affecting
+                    income or spending.
+                  </p>
+                  <button
+                    className="secondary"
+                    onClick={() => setEditor({ kind: "transfer" })}
+                  >
+                    <ArrowLeftRight size={18} />
+                    Transfer money
+                  </button>
+                </div>
+                <div className="management-grid">
+                  {state.wallets.map((w, i) => (
+                    <motion.section
+                      variants={surfaceVariants}
+                      custom={!!reduced}
+                      className={`card wallet-card ${w.archived ? "archived" : ""}`}
+                      key={w.id}
+                    >
                       <div className="card-heading">
-                        <CategoryIcon category={b.category} index={i} />
+                        <span
+                          className="wallet-brand"
+                          style={{ color: colors[i % colors.length] }}
+                        >
+                          <Landmark size={23} />
+                          {w.name}
+                        </span>
                         <button
                           className="icon-button"
-                          aria-label={`Edit ${b.category} budget`}
-                          onClick={() => setEditor({ kind: "budget", item: b })}
+                          aria-label={`Edit ${w.name}`}
+                          onClick={() => setEditor({ kind: "wallet", item: w })}
                         >
                           <Ellipsis size={20} />
                         </button>
                       </div>
-                      <h2>{b.category}</h2>
-                      <div className="budget-number">
-                        {money(spent)}
-                        <small>of {money(b.limit)}</small>
-                      </div>
-                      <Progress value={percent} />
-                      <div className="budget-foot">
-                        <span>{Math.round(percent)}% used</span>
-                        <span>Alert at {b.threshold}%</span>
-                      </div>
-                    </section>
-                  );
-                })}
-              </div>
-              {!budgets.length && (
-                <Empty
-                  title="A plan for your month"
-                  text="Create your first category budget to start planning."
-                  onClick={() => setEditor({ kind: "budget" })}
-                  label="Create budget"
-                />
-              )}
-            </>
-          )}
-          {page === "Wallets" && (
-            <>
-              <div className="section-toolbar">
-                <p>
-                  Transfers move money between wallets without affecting income
-                  or spending.
-                </p>
-                <button
-                  className="secondary"
-                  onClick={() => setEditor({ kind: "transfer" })}
-                >
-                  <ArrowLeftRight size={18} />
-                  Transfer money
-                </button>
-              </div>
-              <div className="management-grid">
-                {state.wallets.map((w, i) => (
-                  <section
-                    className={`card wallet-card ${w.archived ? "archived" : ""}`}
-                    key={w.id}
-                  >
-                    <div className="card-heading">
-                      <span
-                        className="wallet-brand"
-                        style={{ color: colors[i % colors.length] }}
-                      >
-                        <Landmark size={23} />
-                        {w.name}
-                      </span>
-                      <button
-                        className="icon-button"
-                        aria-label={`Edit ${w.name}`}
-                        onClick={() => setEditor({ kind: "wallet", item: w })}
-                      >
-                        <Ellipsis size={20} />
-                      </button>
-                    </div>
-                    <small>
-                      {w.archived ? "Archived wallet" : "Current balance"}
-                    </small>
-                    <strong className="wallet-balance">
-                      {money(walletBalance(state, w.id))}
-                    </strong>
-                    <span className="fine-print">
-                      {w.id === state.settings.defaultWallet
-                        ? "Default wallet"
-                        : w.archived
-                          ? "History is retained"
-                          : "Personal account"}
-                    </span>
-                  </section>
-                ))}
-              </div>
-              <section className="card">
-                <div className="card-heading">
-                  <h2>Recent transfers</h2>
-                </div>
-                {state.transfers.length ? (
-                  [...state.transfers].reverse().map((t) => (
-                    <div className="transfer-row" key={t.id}>
-                      <ArrowLeftRight size={20} />
-                      <span>
-                        {walletNames[t.from]} → {walletNames[t.to]}
-                        <small>{t.date}</small>
-                      </span>
-                      <strong>{money(t.amount)}</strong>
-                    </div>
-                  ))
-                ) : (
-                  <p className="fine-print">Your transfers will appear here.</p>
-                )}
-              </section>
-            </>
-          )}
-          {page === "Analytics" && (
-            <>
-              <div className="stats-grid">
-                <Stat
-                  label="Total spending"
-                  value={money(summary.expense)}
-                  icon={ArrowUpRight}
-                />
-                <Stat
-                  label="Average per day"
-                  value={money(summary.expense / daysInView(month))}
-                  icon={CalendarDays}
-                />
-                <Stat
-                  label="Savings rate"
-                  value={`${summary.rate.toFixed(1)}%`}
-                  icon={Target}
-                />
-                <Stat
-                  label="Biggest category"
-                  value={categoryData[0]?.name ?? "No spending yet"}
-                  icon={ShoppingIcon}
-                />
-              </div>
-              <div className="analytics-grid">
-                {spendingCard}
-                {categoryCard}
-                <section className="card">
-                  <div className="card-heading">
-                    <h2>Income & expenses</h2>
-                  </div>
-                  <ComparisonChart
-                    transactions={state.transactions}
-                    month={month}
-                    period={period}
-                  />
-                </section>
-                <section className="card">
-                  <div className="card-heading">
-                    <h2>A closer look</h2>
-                  </div>
-                  {categoryData.map((c, i) => (
-                    <div className="category-detail" key={c.name}>
-                      <CategoryIcon category={c.name} index={i} />
-                      <span>
-                        <strong>{c.name}</strong>
-                        <small>
-                          {Math.round((c.value / (summary.expense || 1)) * 100)}
-                          % of your spending
-                        </small>
-                      </span>
-                      <strong>{money(c.value)}</strong>
-                    </div>
-                  ))}
-                </section>
-              </div>
-              {insight}
-              {month === today().slice(0, 7) && summary.expense > 0 && (
-                <section className="insight">
-                  <CalendarDays size={22} />
-                  <div>
-                    <strong>Your current spending pace</strong>
-                    <p>
-                      You’re averaging{" "}
-                      {money(summary.expense / daysInView(month))} a day. At
-                      that pace, this month may reach{" "}
-                      {money(
-                        (summary.expense / daysInView(month)) *
-                          new Date(
-                            Number(month.slice(0, 4)),
-                            Number(month.slice(5)),
-                            0,
-                          ).getDate(),
-                      )}
-                      . This is an estimate based on spending so far.
-                    </p>
-                  </div>
-                </section>
-              )}
-            </>
-          )}
-          {page === "Saving goals" && (
-            <>
-              <div className="management-grid">
-                {state.goals.map((g, i) => (
-                  <section className="card goal-card" key={g.id}>
-                    <div className="card-heading">
-                      <span className="goal-icon">
-                        <Target size={26} />
-                      </span>
-                      <button
-                        className="icon-button"
-                        aria-label={`Edit ${g.name}`}
-                        onClick={() => setEditor({ kind: "goal", item: g })}
-                      >
-                        <Ellipsis size={20} />
-                      </button>
-                    </div>
-                    <h2>{g.name}</h2>
-                    <div className="wallet-balance">{money(g.saved)}</div>
-                    <p className="fine-print">of {money(g.target)}</p>
-                    <Progress
-                      value={(g.saved / g.target) * 100}
-                      color={colors[i % colors.length]}
-                    />
-                    <div className="budget-foot">
-                      <span>
-                        {Math.round((g.saved / g.target) * 100)}% saved
-                      </span>
-                      <span>
-                        By{" "}
-                        {new Date(g.date + "T12:00:00").toLocaleDateString(
-                          "en",
-                          { month: "short", year: "numeric" },
-                        )}
-                      </span>
-                    </div>
-                    <button
-                      className="secondary full"
-                      onClick={() => setEditor({ kind: "contribute", item: g })}
-                    >
-                      <Plus size={17} />
-                      Add contribution
-                    </button>
-                  </section>
-                ))}
-              </div>
-              {!state.goals.length && (
-                <Empty
-                  title="What are you saving for?"
-                  text="Set a goal and celebrate your progress, one step at a time."
-                  label="Create a goal"
-                  onClick={() => setEditor({ kind: "goal" })}
-                />
-              )}
-              <p className="fine-print">
-                Goals track money you’ve set aside. Contributions don’t move
-                money between wallets.
-              </p>
-            </>
-          )}
-          {page === "Recurring" && (
-            <>
-              <div className="card">
-                {state.recurring.map((r) => (
-                  <div className="recurring-row" key={r.id}>
-                    <CategoryIcon category={r.category} />
-                    <span className="transaction-copy">
-                      <strong>{r.name}</strong>
                       <small>
-                        {r.frequency} · {r.active ? `Next ${r.next}` : "Paused"}
+                        {w.archived ? "Archived wallet" : "Current balance"}
                       </small>
-                    </span>
-                    <strong>{money(r.amount)}</strong>
-                    <button
-                      className="icon-button"
-                      aria-label={`Edit ${r.name}`}
-                      onClick={() => setEditor({ kind: "recurring", item: r })}
-                    >
-                      <Ellipsis size={20} />
-                    </button>
+                      <strong className="wallet-balance">
+                        <AnimatedAmount value={walletBalance(state, w.id)} />
+                      </strong>
+                      <span className="fine-print">
+                        {w.id === state.settings.defaultWallet
+                          ? "Default wallet"
+                          : w.archived
+                            ? "History is retained"
+                            : "Personal account"}
+                      </span>
+                    </motion.section>
+                  ))}
+                </div>
+                <motion.section
+                  variants={surfaceVariants}
+                  custom={!!reduced}
+                  className="card"
+                >
+                  <div className="card-heading">
+                    <h2>Recent transfers</h2>
                   </div>
-                ))}
-                {!state.recurring.length && (
-                  <p className="fine-print">
-                    Create a schedule for your regular payments.
-                  </p>
-                )}
-              </div>
-              <div className="insight">
-                <Repeat size={22} />
-                <p>
-                  Due transactions are added automatically when you open the
-                  app. For processing while the app is closed, enable the
-                  Supabase schedule in the setup guide.
-                </p>
-              </div>
-            </>
-          )}
-          {page === "Calendar" && (
-            <div className="calendar-layout">
-              <section className="card calendar">
-                <div className="calendar-weekdays">
-                  {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
-                    (d) => (
-                      <span key={d}>{d}</span>
-                    ),
+                  {state.transfers.length ? (
+                    [...state.transfers].reverse().map((t) => (
+                      <div className="transfer-row" key={t.id}>
+                        <ArrowLeftRight size={20} />
+                        <span>
+                          {walletNames[t.from]} → {walletNames[t.to]}
+                          <small>{t.date}</small>
+                        </span>
+                        <strong>{money(t.amount)}</strong>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="fine-print">
+                      Your transfers will appear here.
+                    </p>
                   )}
-                </div>
-                <div className="calendar-grid">
-                  {Array.from(
-                    {
-                      length:
-                        (new Date(month + "-01T12:00:00").getDay() + 6) % 7,
-                    },
-                    (_, i) => (
-                      <span key={`pad-${i}`} />
-                    ),
-                  )}
-                  {Array.from(
-                    {
-                      length: new Date(
-                        Number(month.slice(0, 4)),
-                        Number(month.slice(5)),
-                        0,
-                      ).getDate(),
-                    },
-                    (_, i) => {
-                      const date = `${month}-${String(i + 1).padStart(2, "0")}`;
-                      const hasTx = monthTx.some((t) => t.date === date);
-                      return (
-                        <button
-                          key={date}
-                          className={calendarDate === date ? "selected" : ""}
-                          onClick={() => setCalendarDate(date)}
-                        >
-                          <span>{i + 1}</span>
-                          {hasTx && <i />}
-                        </button>
-                      );
-                    },
-                  )}
-                </div>
-              </section>
-              <section className="card">
-                <div className="card-heading">
-                  <h2>
-                    {new Date(calendarDate + "T12:00:00").toLocaleDateString(
-                      "en-GB",
-                      { day: "numeric", month: "long" },
-                    )}
-                  </h2>
-                </div>
-                <TransactionList
-                  items={state.transactions.filter(
-                    (t) => t.date === calendarDate,
-                  )}
-                  onSelect={setSelected}
-                  walletNames={walletNames}
-                />
-                <div className="calendar-total">
-                  <span>Total spent</span>
-                  <strong>
-                    {money(
-                      totals(
-                        state.transactions.filter(
-                          (t) => t.date === calendarDate,
-                        ),
-                      ).expense,
-                    )}
-                  </strong>
-                </div>
-              </section>
-            </div>
-          )}
-          {page === "Reports" && (
-            <>
-              <section className="card report-card">
-                <div className="card-heading">
-                  <div>
-                    <span className="eyebrow">YOUR MONTHLY STORY</span>
-                    <h2>{monthLabel(month)}</h2>
-                  </div>
-                  <button
-                    className="secondary"
-                    onClick={() =>
-                      download(
-                        `saldo-report-${month}.csv`,
-                        reportCSV(state, month),
-                        "text/csv;charset=utf-8",
-                      )
-                    }
-                  >
-                    <Download size={17} />
-                    Export report
-                  </button>
-                </div>
-                <div className="report-numbers">
+                </motion.section>
+              </>
+            )}
+            {page === "Analytics" && (
+              <>
+                <div className="stats-grid">
                   <Stat
-                    label="Income"
-                    value={money(summary.income)}
-                    icon={ArrowDownLeft}
-                  />
-                  <Stat
-                    label="Expenses"
+                    label="Total spending"
                     value={money(summary.expense)}
                     icon={ArrowUpRight}
                   />
                   <Stat
-                    label="Net savings"
-                    value={money(summary.saved)}
+                    label="Average per day"
+                    value={money(summary.expense / daysInView(month))}
+                    icon={CalendarDays}
+                  />
+                  <Stat
+                    label="Savings rate"
+                    value={`${summary.rate.toFixed(1)}%`}
                     icon={Target}
                   />
+                  <Stat
+                    label="Biggest category"
+                    value={categoryData[0]?.name ?? "No spending yet"}
+                    icon={ShoppingIcon}
+                  />
                 </div>
-                <div className="report-metrics">
-                  <div>
-                    <span>Savings rate</span>
-                    <strong>{summary.rate.toFixed(1)}%</strong>
-                  </div>
-                  <div>
-                    <span>Largest spending category</span>
-                    <strong>{categoryData[0]?.name ?? "—"}</strong>
-                  </div>
-                  <div>
-                    <span>Highest spending day</span>
-                    <strong>{highestDay(monthTx) ?? "—"}</strong>
-                  </div>
-                  <div>
-                    <span>Average daily spending</span>
-                    <strong>
-                      {money(summary.expense / daysInView(month))}
-                    </strong>
-                  </div>
-                  <div>
-                    <span>Budget performance</span>
-                    <strong>
-                      {budgetTotal
-                        ? `${Math.round(used)}% used`
-                        : "No budget set"}
-                    </strong>
-                  </div>
-                  <div>
-                    <span>Compared with last month</span>
-                    <strong>
-                      {change === null
-                        ? "No previous spending"
-                        : `${Math.abs(change).toFixed(1)}% ${change > 0 ? "more" : "less"}`}
-                    </strong>
-                  </div>
+                <div className="analytics-grid">
+                  {spendingCard}
+                  {categoryCard}
+                  <motion.section
+                    variants={surfaceVariants}
+                    custom={!!reduced}
+                    className="card"
+                  >
+                    <div className="card-heading">
+                      <h2>Income & expenses</h2>
+                    </div>
+                    <ComparisonChart
+                      transactions={state.transactions}
+                      month={month}
+                      period={period}
+                    />
+                  </motion.section>
+                  <motion.section
+                    variants={surfaceVariants}
+                    custom={!!reduced}
+                    className="card"
+                  >
+                    <div className="card-heading">
+                      <h2>A closer look</h2>
+                    </div>
+                    {categoryData.map((c, i) => (
+                      <div className="category-detail" key={c.name}>
+                        <CategoryIcon category={c.name} index={i} />
+                        <span>
+                          <strong>{c.name}</strong>
+                          <small>
+                            {Math.round(
+                              (c.value / (summary.expense || 1)) * 100,
+                            )}
+                            % of your spending
+                          </small>
+                        </span>
+                        <strong>{money(c.value)}</strong>
+                      </div>
+                    ))}
+                  </motion.section>
                 </div>
-              </section>
-              {spendingCard}
-              {insight}
-            </>
-          )}
-          {page === "Profile" && (
-            <>
-              <section className="card profile-card">
-                <div className="profile-intro">
-                  <span className="avatar large-avatar">
-                    {state.settings.name.slice(0, 1)}
-                  </span>
-                  <div>
-                    <h2>{state.settings.name}</h2>
-                    <p>{user?.email ?? "Explore Saldo with sample finances"}</p>
-                  </div>
-                  {!user && (
-                    <button className="primary" onClick={() => setAuth(true)}>
-                      Sign in
-                    </button>
+                {insight}
+                {month === today().slice(0, 7) && summary.expense > 0 && (
+                  <motion.section
+                    variants={surfaceVariants}
+                    custom={!!reduced}
+                    className="insight"
+                  >
+                    <CalendarDays size={22} />
+                    <div>
+                      <strong>Your current spending pace</strong>
+                      <p>
+                        You’re averaging{" "}
+                        {money(summary.expense / daysInView(month))} a day. At
+                        that pace, this month may reach{" "}
+                        {money(
+                          (summary.expense / daysInView(month)) *
+                            new Date(
+                              Number(month.slice(0, 4)),
+                              Number(month.slice(5)),
+                              0,
+                            ).getDate(),
+                        )}
+                        . This is an estimate based on spending so far.
+                      </p>
+                    </div>
+                  </motion.section>
+                )}
+              </>
+            )}
+            {page === "Saving goals" && (
+              <>
+                <div className="management-grid">
+                  {state.goals.map((g, i) => (
+                    <motion.section
+                      variants={surfaceVariants}
+                      custom={!!reduced}
+                      className="card goal-card"
+                      key={g.id}
+                    >
+                      <div className="card-heading">
+                        <span className="goal-icon">
+                          <Target size={26} />
+                        </span>
+                        <button
+                          className="icon-button"
+                          aria-label={`Edit ${g.name}`}
+                          onClick={() => setEditor({ kind: "goal", item: g })}
+                        >
+                          <Ellipsis size={20} />
+                        </button>
+                      </div>
+                      <h2>{g.name}</h2>
+                      <div className="wallet-balance">
+                        <AnimatedAmount value={g.saved} />
+                      </div>
+                      <p className="fine-print">of {money(g.target)}</p>
+                      <Progress
+                        value={(g.saved / g.target) * 100}
+                        color={colors[i % colors.length]}
+                      />
+                      <div className="budget-foot">
+                        <span>
+                          {Math.round((g.saved / g.target) * 100)}% saved
+                        </span>
+                        <span>
+                          By{" "}
+                          {new Date(g.date + "T12:00:00").toLocaleDateString(
+                            "en",
+                            { month: "short", year: "numeric" },
+                          )}
+                        </span>
+                      </div>
+                      <button
+                        className="secondary full"
+                        onClick={() =>
+                          setEditor({ kind: "contribute", item: g })
+                        }
+                      >
+                        <Plus size={17} />
+                        Add contribution
+                      </button>
+                    </motion.section>
+                  ))}
+                </div>
+                {!state.goals.length && (
+                  <Empty
+                    title="What are you saving for?"
+                    text="Set a goal and celebrate your progress, one step at a time."
+                    label="Create a goal"
+                    onClick={() => setEditor({ kind: "goal" })}
+                  />
+                )}
+                <p className="fine-print">
+                  Goals track money you’ve set aside. Contributions don’t move
+                  money between wallets.
+                </p>
+              </>
+            )}
+            {page === "Recurring" && (
+              <>
+                <div className="card">
+                  {state.recurring.map((r) => (
+                    <div className="recurring-row" key={r.id}>
+                      <CategoryIcon category={r.category} />
+                      <span className="transaction-copy">
+                        <strong>{r.name}</strong>
+                        <small>
+                          {r.frequency} ·{" "}
+                          {r.active ? `Next ${r.next}` : "Paused"}
+                        </small>
+                      </span>
+                      <strong>{money(r.amount)}</strong>
+                      <button
+                        className="icon-button"
+                        aria-label={`Edit ${r.name}`}
+                        onClick={() =>
+                          setEditor({ kind: "recurring", item: r })
+                        }
+                      >
+                        <Ellipsis size={20} />
+                      </button>
+                    </div>
+                  ))}
+                  {!state.recurring.length && (
+                    <p className="fine-print">
+                      Create a schedule for your regular payments.
+                    </p>
                   )}
                 </div>
-                <form
-                  className="form-stack"
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    const form = new FormData(e.currentTarget);
+                <div className="insight">
+                  <Repeat size={22} />
+                  <p>
+                    Due transactions are added automatically when you open the
+                    app. For processing while the app is closed, enable the
+                    Supabase schedule in the setup guide.
+                  </p>
+                </div>
+              </>
+            )}
+            {page === "Calendar" && (
+              <div className="calendar-layout">
+                <motion.section
+                  variants={surfaceVariants}
+                  custom={!!reduced}
+                  className="card calendar"
+                >
+                  <div className="calendar-weekdays">
+                    {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(
+                      (d) => (
+                        <span key={d}>{d}</span>
+                      ),
+                    )}
+                  </div>
+                  <div className="calendar-grid">
+                    {Array.from(
+                      {
+                        length:
+                          (new Date(month + "-01T12:00:00").getDay() + 6) % 7,
+                      },
+                      (_, i) => (
+                        <span key={`pad-${i}`} />
+                      ),
+                    )}
+                    {Array.from(
+                      {
+                        length: new Date(
+                          Number(month.slice(0, 4)),
+                          Number(month.slice(5)),
+                          0,
+                        ).getDate(),
+                      },
+                      (_, i) => {
+                        const date = `${month}-${String(i + 1).padStart(2, "0")}`;
+                        const hasTx = monthTx.some((t) => t.date === date);
+                        return (
+                          <button
+                            key={date}
+                            className={calendarDate === date ? "selected" : ""}
+                            onClick={() => setCalendarDate(date)}
+                          >
+                            <span>{i + 1}</span>
+                            {hasTx && <i />}
+                          </button>
+                        );
+                      },
+                    )}
+                  </div>
+                </motion.section>
+                <motion.section
+                  variants={surfaceVariants}
+                  custom={!!reduced}
+                  className="card"
+                >
+                  <div className="card-heading">
+                    <h2>
+                      {new Date(calendarDate + "T12:00:00").toLocaleDateString(
+                        "en-GB",
+                        { day: "numeric", month: "long" },
+                      )}
+                    </h2>
+                  </div>
+                  <TransactionList
+                    items={state.transactions.filter(
+                      (t) => t.date === calendarDate,
+                    )}
+                    onSelect={setSelected}
+                    walletNames={walletNames}
+                  />
+                  <div className="calendar-total">
+                    <span>Total spent</span>
+                    <strong>
+                      {money(
+                        totals(
+                          state.transactions.filter(
+                            (t) => t.date === calendarDate,
+                          ),
+                        ).expense,
+                      )}
+                    </strong>
+                  </div>
+                </motion.section>
+              </div>
+            )}
+            {page === "Reports" && (
+              <>
+                <motion.section
+                  variants={surfaceVariants}
+                  custom={!!reduced}
+                  className="card report-card"
+                >
+                  <div className="card-heading">
+                    <div>
+                      <span className="eyebrow">YOUR MONTHLY STORY</span>
+                      <h2>{monthLabel(month)}</h2>
+                    </div>
+                    <button
+                      className="secondary"
+                      onClick={() =>
+                        download(
+                          `saldo-report-${month}.csv`,
+                          reportCSV(state, month),
+                          "text/csv;charset=utf-8",
+                        )
+                      }
+                    >
+                      <Download size={17} />
+                      Export report
+                    </button>
+                  </div>
+                  <div className="report-numbers">
+                    <Stat
+                      label="Income"
+                      value={money(summary.income)}
+                      icon={ArrowDownLeft}
+                    />
+                    <Stat
+                      label="Expenses"
+                      value={money(summary.expense)}
+                      icon={ArrowUpRight}
+                    />
+                    <Stat
+                      label="Net savings"
+                      value={money(summary.saved)}
+                      icon={Target}
+                    />
+                  </div>
+                  <div className="report-metrics">
+                    <div>
+                      <span>Savings rate</span>
+                      <strong>{summary.rate.toFixed(1)}%</strong>
+                    </div>
+                    <div>
+                      <span>Largest spending category</span>
+                      <strong>{categoryData[0]?.name ?? "—"}</strong>
+                    </div>
+                    <div>
+                      <span>Highest spending day</span>
+                      <strong>{highestDay(monthTx) ?? "—"}</strong>
+                    </div>
+                    <div>
+                      <span>Average daily spending</span>
+                      <strong>
+                        {money(summary.expense / daysInView(month))}
+                      </strong>
+                    </div>
+                    <div>
+                      <span>Budget performance</span>
+                      <strong>
+                        {budgetTotal
+                          ? `${Math.round(used)}% used`
+                          : "No budget set"}
+                      </strong>
+                    </div>
+                    <div>
+                      <span>Compared with last month</span>
+                      <strong>
+                        {change === null
+                          ? "No previous spending"
+                          : `${Math.abs(change).toFixed(1)}% ${change > 0 ? "more" : "less"}`}
+                      </strong>
+                    </div>
+                  </div>
+                </motion.section>
+                {spendingCard}
+                {insight}
+              </>
+            )}
+            {page === "Profile" && (
+              <>
+                <motion.section
+                  variants={surfaceVariants}
+                  custom={!!reduced}
+                  className="card profile-card"
+                >
+                  <div className="profile-intro">
+                    <span className="avatar large-avatar">
+                      {state.settings.name.slice(0, 1)}
+                    </span>
+                    <div>
+                      <h2>{state.settings.name}</h2>
+                      <p>
+                        {user?.email ?? "Explore Saldo with sample finances"}
+                      </p>
+                    </div>
+                    {!user && (
+                      <button className="primary" onClick={() => setAuth(true)}>
+                        Sign in
+                      </button>
+                    )}
+                  </div>
+                  <form
+                    className="form-stack"
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      const form = new FormData(e.currentTarget);
+                      try {
+                        await save(
+                          {
+                            ...state,
+                            settings: {
+                              ...state.settings,
+                              name: String(form.get("name")),
+                              defaultWallet: String(form.get("wallet")),
+                              theme: String(
+                                form.get("theme"),
+                              ) as FinanceState["settings"]["theme"],
+                              budgetAlerts: form.has("budgetAlerts"),
+                              recurringAlerts: form.has("recurringAlerts"),
+                              reportAlerts: form.has("reportAlerts"),
+                            },
+                          },
+                          "Settings saved",
+                        );
+                      } catch (e) {
+                        notify((e as Error).message);
+                      }
+                    }}
+                  >
+                    <div className="form-grid">
+                      <Field label="Your name">
+                        <input
+                          name="name"
+                          defaultValue={state.settings.name}
+                          required
+                          maxLength={60}
+                        />
+                      </Field>
+                      <Field label="Currency">
+                        <select name="currency" disabled>
+                          <option>Indonesian Rupiah · IDR</option>
+                        </select>
+                      </Field>
+                      <Field label="Default wallet">
+                        <select
+                          name="wallet"
+                          defaultValue={state.settings.defaultWallet}
+                        >
+                          {state.wallets
+                            .filter((w) => !w.archived)
+                            .map((w) => (
+                              <option key={w.id} value={w.id}>
+                                {w.name}
+                              </option>
+                            ))}
+                        </select>
+                      </Field>
+                      <Field label="Appearance">
+                        <select
+                          name="theme"
+                          defaultValue={state.settings.theme}
+                        >
+                          <option value="system">Follow system</option>
+                          <option value="light">Light</option>
+                          <option value="dark">Dark</option>
+                        </select>
+                      </Field>
+                    </div>
+                    <h3>Notifications</h3>
+                    {(
+                      [
+                        "budgetAlerts",
+                        "recurringAlerts",
+                        "reportAlerts",
+                      ] as const
+                    ).map((key, i) => (
+                      <label className="switch-row" key={key}>
+                        <span>
+                          {
+                            [
+                              "Budget alerts",
+                              "Recurring payment reminders",
+                              "Monthly report",
+                            ][i]
+                          }
+                        </span>
+                        <input
+                          type="checkbox"
+                          className="switch"
+                          name={key}
+                          defaultChecked={state.settings[key]}
+                        />
+                      </label>
+                    ))}
+                    <button className="primary" disabled={busy}>
+                      Save settings
+                    </button>
+                  </form>
+                </motion.section>
+                <motion.section
+                  variants={surfaceVariants}
+                  custom={!!reduced}
+                  className="card settings-tools"
+                >
+                  <button onClick={() => select("Budgets")}>
+                    <WalletIcon size={20} />
+                    Monthly budgets
+                    <ChevronRight size={18} />
+                  </button>
+                  <button onClick={() => select("Wallets")}>
+                    <Landmark size={20} />
+                    Manage wallets
+                    <ChevronRight size={18} />
+                  </button>
+                  <button onClick={() => select("Saving goals")}>
+                    <Target size={20} />
+                    Saving goals
+                    <ChevronRight size={18} />
+                  </button>
+                  <button onClick={() => select("Recurring")}>
+                    <Repeat size={20} />
+                    Recurring transactions
+                    <ChevronRight size={18} />
+                  </button>
+                  <button onClick={() => select("Calendar")}>
+                    <CalendarDays size={20} />
+                    Financial calendar
+                    <ChevronRight size={18} />
+                  </button>
+                  <button onClick={() => select("Reports")}>
+                    <FileChartColumn size={20} />
+                    Monthly reports
+                    <ChevronRight size={18} />
+                  </button>
+                  <button
+                    onClick={() =>
+                      download(
+                        "saldo-finances.json",
+                        JSON.stringify(state, null, 2),
+                      )
+                    }
+                  >
+                    <Download size={20} />
+                    Export all data
+                    <ChevronRight size={18} />
+                  </button>
+                  {user && (
+                    <button
+                      onClick={async () => {
+                        const result = await supabase?.auth.signOut();
+                        if (result?.error)
+                          notify("Could not sign out. Please try again.");
+                        else notify("Signed out");
+                      }}
+                    >
+                      <LogOut size={20} />
+                      Sign out
+                      <ChevronRight size={18} />
+                    </button>
+                  )}
+                </motion.section>
+              </>
+            )}
+            <footer className="app-footer">
+              <span className="footer-mark">
+                <WalletIcon size={14} />
+                saldo.
+              </span>
+              <span>A little more clarity. A little less worry.</span>
+            </footer>
+          </motion.main>
+        </div>
+        <nav className="bottom-nav" aria-label="Mobile navigation">
+          {(
+            [
+              { name: "Overview", label: "Home", icon: LayoutDashboard },
+              { name: "Transactions", label: "Activity", icon: ArrowLeftRight },
+              { name: "Add", label: "Add", icon: Plus },
+              {
+                name: "Analytics",
+                label: "Analytics",
+                icon: ChartNoAxesCombined,
+              },
+              { name: "Profile", label: "Profile", icon: UserRound },
+            ] as { name: string; label: string; icon: LucideIcon }[]
+          ).map(({ name, label, icon: Icon }) => (
+            <button
+              key={name}
+              aria-label={name === "Add" ? "Add transaction" : label}
+              className={`${name === "Add" ? "add-nav" : ""} ${page === name ? "active" : ""}`}
+              onClick={() =>
+                name === "Add"
+                  ? (setEditing(undefined), setAdding(true))
+                  : select(name as Page)
+              }
+            >
+              <Icon size={22} />
+              <span>{label}</span>
+            </button>
+          ))}
+        </nav>
+        <Sheet
+          open={adding}
+          title={editing ? "Edit transaction" : "Add transaction"}
+          onClose={() => {
+            if (!busy) {
+              setAdding(false);
+              setEditing(undefined);
+            }
+          }}
+        >
+          {adding && (
+            <TransactionForm
+              state={state}
+              initial={editing}
+              onSave={transactionSave}
+              busy={busy}
+              userId={user?.id}
+            />
+          )}
+        </Sheet>
+        <Sheet
+          open={selected !== null}
+          title="Transaction details"
+          onClose={() => setSelected(null)}
+        >
+          {selected && (
+            <div className="form-stack">
+              <CategoryIcon category={selected.category} />
+              <h2 className="detail-amount">
+                {selected.type === "income" ? "+" : "−"}{" "}
+                {money(selected.amount)}
+              </h2>
+              <h3>{selected.name}</h3>
+              <div className="detail-list">
+                <div>
+                  <span>Category</span>
+                  <strong>{selected.category}</strong>
+                </div>
+                <div>
+                  <span>Wallet</span>
+                  <strong>{walletNames[selected.wallet]}</strong>
+                </div>
+                <div>
+                  <span>Date</span>
+                  <strong>{selected.date}</strong>
+                </div>
+                {selected.note && <p>{selected.note}</p>}
+                {selected.receipt && (
+                  <button
+                    className="secondary"
+                    onClick={async () => {
+                      const result = await supabase?.storage
+                        .from("receipts")
+                        .createSignedUrl(selected.receipt!, 60);
+                      if (result?.data)
+                        window.open(
+                          result.data.signedUrl,
+                          "_blank",
+                          "noopener,noreferrer",
+                        );
+                      else notify("This receipt could not be opened.");
+                    }}
+                  >
+                    View receipt
+                  </button>
+                )}
+              </div>
+              <div className="detail-actions">
+                <button
+                  className="secondary"
+                  disabled={busy}
+                  onClick={() => {
+                    setEditing(selected);
+                    setSelected(null);
+                    setAdding(true);
+                  }}
+                >
+                  <Pencil size={17} />
+                  Edit
+                </button>
+                <button
+                  className="secondary"
+                  disabled={busy}
+                  onClick={async () => {
                     try {
                       await save(
                         {
                           ...state,
-                          settings: {
-                            ...state.settings,
-                            name: String(form.get("name")),
-                            defaultWallet: String(form.get("wallet")),
-                            theme: String(
-                              form.get("theme"),
-                            ) as FinanceState["settings"]["theme"],
-                            budgetAlerts: form.has("budgetAlerts"),
-                            recurringAlerts: form.has("recurringAlerts"),
-                            reportAlerts: form.has("reportAlerts"),
-                          },
+                          transactions: [
+                            ...state.transactions,
+                            { ...selected, id: uid(), recurringId: undefined },
+                          ],
                         },
-                        "Settings saved",
+                        "Transaction duplicated",
                       );
+                      setSelected(null);
                     } catch (e) {
                       notify((e as Error).message);
                     }
                   }}
                 >
-                  <div className="form-grid">
-                    <Field label="Your name">
-                      <input
-                        name="name"
-                        defaultValue={state.settings.name}
-                        required
-                        maxLength={60}
-                      />
-                    </Field>
-                    <Field label="Currency">
-                      <select name="currency" disabled>
-                        <option>Indonesian Rupiah · IDR</option>
-                      </select>
-                    </Field>
-                    <Field label="Default wallet">
-                      <select
-                        name="wallet"
-                        defaultValue={state.settings.defaultWallet}
-                      >
-                        {state.wallets
-                          .filter((w) => !w.archived)
-                          .map((w) => (
-                            <option key={w.id} value={w.id}>
-                              {w.name}
-                            </option>
-                          ))}
-                      </select>
-                    </Field>
-                    <Field label="Appearance">
-                      <select name="theme" defaultValue={state.settings.theme}>
-                        <option value="system">Follow system</option>
-                        <option value="light">Light</option>
-                        <option value="dark">Dark</option>
-                      </select>
-                    </Field>
-                  </div>
-                  <h3>Notifications</h3>
-                  {(
-                    ["budgetAlerts", "recurringAlerts", "reportAlerts"] as const
-                  ).map((key, i) => (
-                    <label className="switch-row" key={key}>
-                      <span>
-                        {
-                          [
-                            "Budget alerts",
-                            "Recurring payment reminders",
-                            "Monthly report",
-                          ][i]
-                        }
-                      </span>
-                      <input
-                        type="checkbox"
-                        className="switch"
-                        name={key}
-                        defaultChecked={state.settings[key]}
-                      />
-                    </label>
-                  ))}
-                  <button className="primary" disabled={busy}>
-                    Save settings
-                  </button>
-                </form>
-              </section>
-              <section className="card settings-tools">
-                <button onClick={() => select("Budgets")}>
-                  <WalletIcon size={20} />
-                  Monthly budgets
-                  <ChevronRight size={18} />
-                </button>
-                <button onClick={() => select("Wallets")}>
-                  <Landmark size={20} />
-                  Manage wallets
-                  <ChevronRight size={18} />
-                </button>
-                <button onClick={() => select("Saving goals")}>
-                  <Target size={20} />
-                  Saving goals
-                  <ChevronRight size={18} />
-                </button>
-                <button onClick={() => select("Recurring")}>
-                  <Repeat size={20} />
-                  Recurring transactions
-                  <ChevronRight size={18} />
-                </button>
-                <button onClick={() => select("Calendar")}>
-                  <CalendarDays size={20} />
-                  Financial calendar
-                  <ChevronRight size={18} />
-                </button>
-                <button onClick={() => select("Reports")}>
-                  <FileChartColumn size={20} />
-                  Monthly reports
-                  <ChevronRight size={18} />
+                  <Copy size={17} />
+                  Duplicate
                 </button>
                 <button
-                  onClick={() =>
-                    download(
-                      "saldo-finances.json",
-                      JSON.stringify(state, null, 2),
-                    )
-                  }
-                >
-                  <Download size={20} />
-                  Export all data
-                  <ChevronRight size={18} />
-                </button>
-                {user && (
-                  <button
-                    onClick={async () => {
-                      const result = await supabase?.auth.signOut();
-                      if (result?.error)
-                        notify("Could not sign out. Please try again.");
-                      else notify("Signed out");
-                    }}
-                  >
-                    <LogOut size={20} />
-                    Sign out
-                    <ChevronRight size={18} />
-                  </button>
-                )}
-              </section>
-            </>
-          )}
-          <footer className="app-footer">
-            <span className="footer-mark">
-              <WalletIcon size={14} />
-              saldo.
-            </span>
-            <span>A little more clarity. A little less worry.</span>
-          </footer>
-        </main>
-      </div>
-      <nav className="bottom-nav" aria-label="Mobile navigation">
-        {(
-          [
-            { name: "Overview", label: "Home", icon: LayoutDashboard },
-            { name: "Transactions", label: "Activity", icon: ArrowLeftRight },
-            { name: "Add", label: "Add", icon: Plus },
-            {
-              name: "Analytics",
-              label: "Analytics",
-              icon: ChartNoAxesCombined,
-            },
-            { name: "Profile", label: "Profile", icon: UserRound },
-          ] as { name: string; label: string; icon: LucideIcon }[]
-        ).map(({ name, label, icon: Icon }) => (
-          <button
-            key={name}
-            aria-label={name === "Add" ? "Add transaction" : label}
-            className={`${name === "Add" ? "add-nav" : ""} ${page === name ? "active" : ""}`}
-            onClick={() =>
-              name === "Add"
-                ? (setEditing(undefined), setAdding(true))
-                : select(name as Page)
-            }
-          >
-            <Icon size={22} />
-            <span>{label}</span>
-          </button>
-        ))}
-      </nav>
-      <Sheet
-        open={adding}
-        title={editing ? "Edit transaction" : "Add transaction"}
-        onClose={() => {
-          if (!busy) {
-            setAdding(false);
-            setEditing(undefined);
-          }
-        }}
-      >
-        {adding && (
-          <TransactionForm
-            state={state}
-            initial={editing}
-            onSave={transactionSave}
-            busy={busy}
-            userId={user?.id}
-          />
-        )}
-      </Sheet>
-      <Sheet
-        open={selected !== null}
-        title="Transaction details"
-        onClose={() => setSelected(null)}
-      >
-        {selected && (
-          <div className="form-stack">
-            <CategoryIcon category={selected.category} />
-            <h2 className="detail-amount">
-              {selected.type === "income" ? "+" : "−"} {money(selected.amount)}
-            </h2>
-            <h3>{selected.name}</h3>
-            <div className="detail-list">
-              <div>
-                <span>Category</span>
-                <strong>{selected.category}</strong>
-              </div>
-              <div>
-                <span>Wallet</span>
-                <strong>{walletNames[selected.wallet]}</strong>
-              </div>
-              <div>
-                <span>Date</span>
-                <strong>{selected.date}</strong>
-              </div>
-              {selected.note && <p>{selected.note}</p>}
-              {selected.receipt && (
-                <button
-                  className="secondary"
+                  className="danger-button"
+                  disabled={busy}
                   onClick={async () => {
-                    const result = await supabase?.storage
-                      .from("receipts")
-                      .createSignedUrl(selected.receipt!, 60);
-                    if (result?.data)
-                      window.open(
-                        result.data.signedUrl,
-                        "_blank",
-                        "noopener,noreferrer",
+                    try {
+                      await save(
+                        {
+                          ...state,
+                          transactions: state.transactions.filter(
+                            (t) => t.id !== selected.id,
+                          ),
+                        },
+                        "Transaction deleted",
                       );
-                    else notify("This receipt could not be opened.");
+                      setSelected(null);
+                    } catch (e) {
+                      notify((e as Error).message);
+                    }
                   }}
                 >
-                  View receipt
+                  <Trash2 size={17} />
+                  Delete
                 </button>
-              )}
-            </div>
-            <div className="detail-actions">
-              <button
-                className="secondary"
-                disabled={busy}
-                onClick={() => {
-                  setEditing(selected);
-                  setSelected(null);
-                  setAdding(true);
-                }}
-              >
-                <Pencil size={17} />
-                Edit
-              </button>
-              <button
-                className="secondary"
-                disabled={busy}
-                onClick={async () => {
-                  try {
-                    await save(
-                      {
-                        ...state,
-                        transactions: [
-                          ...state.transactions,
-                          { ...selected, id: uid(), recurringId: undefined },
-                        ],
-                      },
-                      "Transaction duplicated",
-                    );
-                    setSelected(null);
-                  } catch (e) {
-                    notify((e as Error).message);
-                  }
-                }}
-              >
-                <Copy size={17} />
-                Duplicate
-              </button>
-              <button
-                className="danger-button"
-                disabled={busy}
-                onClick={async () => {
-                  try {
-                    await save(
-                      {
-                        ...state,
-                        transactions: state.transactions.filter(
-                          (t) => t.id !== selected.id,
-                        ),
-                      },
-                      "Transaction deleted",
-                    );
-                    setSelected(null);
-                  } catch (e) {
-                    notify((e as Error).message);
-                  }
-                }}
-              >
-                <Trash2 size={17} />
-                Delete
-              </button>
-            </div>
-          </div>
-        )}
-      </Sheet>
-      <Sheet
-        open={editor !== null}
-        title={editorTitle(editor)}
-        onClose={() => {
-          if (!busy) setEditor(null);
-        }}
-      >
-        {editor && (
-          <EntityForm
-            key={`${editor.kind}-${"item" in editor ? editor.item?.id : ""}`}
-            editor={editor}
-            state={state}
-            month={month}
-            busy={busy}
-            onSave={async (next, message) => {
-              await save(next, message);
-              setEditor(null);
-            }}
-          />
-        )}
-      </Sheet>
-      <Sheet open={auth} title="Your own space" onClose={() => setAuth(false)}>
-        {auth && (
-          <AuthForm configured={configured} onDone={() => setAuth(false)} />
-        )}
-      </Sheet>
-      <Sheet
-        open={notifications}
-        title="A little heads-up"
-        onClose={() => setNotifications(false)}
-      >
-        {allAlerts.length ? (
-          allAlerts.map((a, i) => (
-            <div className="notification-row" key={i}>
-              <Bell size={20} />
-              <div>
-                <strong>{a.title}</strong>
-                <p>{a.text}</p>
               </div>
             </div>
-          ))
-        ) : (
-          <div className="empty">
-            <Check size={28} />
-            <h3>You’re all caught up</h3>
-            <p>Budget alerts and upcoming payments will appear here.</p>
+          )}
+        </Sheet>
+        <Sheet
+          open={editor !== null}
+          title={editorTitle(editor)}
+          onClose={() => {
+            if (!busy) setEditor(null);
+          }}
+        >
+          {editor && (
+            <EntityForm
+              key={`${editor.kind}-${"item" in editor ? editor.item?.id : ""}`}
+              editor={editor}
+              state={state}
+              month={month}
+              busy={busy}
+              onSave={async (next, message) => {
+                await save(next, message);
+                setEditor(null);
+              }}
+            />
+          )}
+        </Sheet>
+        <Sheet
+          open={auth}
+          title="Your own space"
+          onClose={() => setAuth(false)}
+        >
+          {auth && (
+            <AuthForm configured={configured} onDone={() => setAuth(false)} />
+          )}
+        </Sheet>
+        <Sheet
+          open={notifications}
+          title="A little heads-up"
+          onClose={() => setNotifications(false)}
+        >
+          {allAlerts.length ? (
+            allAlerts.map((a, i) => (
+              <div className="notification-row" key={i}>
+                <Bell size={20} />
+                <div>
+                  <strong>{a.title}</strong>
+                  <p>{a.text}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="empty">
+              <Check size={28} />
+              <h3>You’re all caught up</h3>
+              <p>Budget alerts and upcoming payments will appear here.</p>
+            </div>
+          )}
+          {state.settings.reportAlerts && (
+            <button
+              className="report-link"
+              onClick={() => {
+                setNotifications(false);
+                select("Reports");
+              }}
+            >
+              Your monthly report
+              <ChevronRight size={18} />
+            </button>
+          )}
+        </Sheet>
+        <AnimatePresence>
+          {toast && (
+            <motion.div
+              key={toast}
+              className="toast"
+              role="status"
+              style={{ x: "-50%" }}
+              initial={{
+                opacity: 0,
+                y: reduced ? 0 : 12,
+                scale: reduced ? 1 : 0.97,
+              }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{
+                opacity: 0,
+                y: reduced ? 0 : 8,
+                scale: reduced ? 1 : 0.98,
+              }}
+            >
+              <Check size={18} />
+              {toast}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {error && state && (
+          <div className="toast error-toast" role="alert">
+            {error}
           </div>
         )}
-        {state.settings.reportAlerts && (
-          <button
-            className="report-link"
-            onClick={() => {
-              setNotifications(false);
-              select("Reports");
-            }}
-          >
-            Your monthly report
-            <ChevronRight size={18} />
-          </button>
-        )}
-      </Sheet>
-      {toast && (
-        <div className="toast" role="status">
-          <Check size={18} />
-          {toast}
-        </div>
-      )}
-      {error && state && (
-        <div className="toast error-toast" role="alert">
-          {error}
-        </div>
-      )}
-    </div>
+      </div>
+    </MotionConfig>
   );
 }
 const ShoppingIcon = WalletIcon;
@@ -2179,7 +2354,8 @@ function EntityForm({
             <select name="from">
               {activeWallets.map((w) => (
                 <option value={w.id} key={w.id}>
-                  {w.name} · {money(walletBalance(state, w.id))}
+                  {w.name} ·{" "}
+                  <AnimatedAmount value={walletBalance(state, w.id)} />
                 </option>
               ))}
             </select>
