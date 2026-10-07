@@ -55,6 +55,7 @@ export type Contribution = {
   date: string;
 };
 export type Settings = {
+  visualTheme?: "light" | "dark" | "green" | "blue";
   customCategories?: CustomCategory[];
   onboardingComplete?: boolean;
   name: string;
@@ -164,13 +165,13 @@ export const categories = [
   "Freelance",
 ];
 export const colors = [
-  "#608b6f",
-  "#b5bf79",
-  "#d5b878",
-  "#ce916f",
-  "#9a9e75",
-  "#83aa97",
-  "#9c998c",
+  "var(--category-1)",
+  "var(--category-2)",
+  "var(--category-3)",
+  "var(--category-4)",
+  "var(--category-5)",
+  "var(--category-6)",
+  "var(--category-7)",
 ];
 export const money = (value: number) =>
   `Rp ${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(value)}`;

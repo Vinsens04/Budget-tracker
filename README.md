@@ -1,6 +1,6 @@
 # Saldo
 
-A mobile-first personal finance app, built with Next.js App Router, strict TypeScript, Tailwind CSS, Supabase/PostgreSQL, Recharts, Lucide and Motion. The Apple Design reference supplied with the brief guided the system typography, blue accent, rounded surfaces, touch feedback, sheets and reduced-motion behavior.
+A mobile-first personal finance app, built with Next.js App Router, strict TypeScript, Tailwind CSS, Supabase/PostgreSQL, Recharts, Lucide and Motion. Its finance-journal interface pairs expressive headings, receipt details, clear charts and smooth, accessible interactions.
 
 ## Run locally
 
@@ -25,7 +25,8 @@ Open http://127.0.0.1:3000. The project is already connected to your Supabase pr
 - Email/password registration, login, reset-password flow and logout. Google OAuth is prepared behind a configuration flag.
 - First-use wallet/balance setup, custom expense/income categories with linked renaming, and bookmarkable screens with browser Back support.
 - Connection status, automatic refresh on reconnect/focus, and revision-conflict recovery that keeps the open form intact.
-- Light/dark/system themes, notification preferences, keyboard focus and reduced motion/transparency/contrast handling.
+- Four coordinated themes: Light, Dark, original Green and Blue. Switch through the header palette or Profile → Appearance; account preferences sync with Supabase, while demo preferences persist on the device. Legacy system preferences remain supported until a theme is selected.
+- Notification preferences, keyboard focus and reduced motion/transparency/contrast handling.
 
 Signed-in accounts start empty and save to Supabase. Signed-out demo data is session-only and cannot mix with account data. Financial notifications are in-app; browser push and email delivery are not configured. Receipt extraction is intentionally manual for now; OCR/AI can be added later with a review step before saving.
 

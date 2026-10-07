@@ -142,6 +142,46 @@ try {
   );
   const login = await publicClient.auth.signInWithPassword({ email, password });
   assert.equal(login.error, null);
+  for (const theme of ["light", "dark", "green", "blue"]) {
+    await page
+      .getByRole("button", { name: "Change theme", exact: true })
+      .click();
+    await page
+      .getByRole("button", {
+        name: `${theme[0].toUpperCase()}${theme.slice(1)} theme`,
+        exact: true,
+      })
+      .click();
+    await page.waitForFunction(
+      (value) => localStorage.getItem("saldo.visual-theme") === value,
+      theme,
+    );
+    await page
+      .getByRole("button", { name: "Close dialog", exact: true })
+      .click();
+    const savedTheme = await publicClient
+      .from("finance_workspaces")
+      .select("state")
+      .eq("user_id", userId)
+      .single();
+    assert.equal(savedTheme.error, null);
+    assert.equal(savedTheme.data.state.settings.visualTheme, theme);
+    assert.equal(
+      savedTheme.data.state.settings.theme,
+      theme === "dark" ? "dark" : "light",
+    );
+  }
+  await page.reload();
+  await nav.getByRole("button", { name: "Profile", exact: true }).click();
+  await page.getByText(email, { exact: true }).waitFor();
+  assert.equal(await page.locator("html").getAttribute("data-palette"), "blue");
+  assert.equal(
+    await page.getByLabel("Appearance", { exact: true }).inputValue(),
+    "blue",
+  );
+  console.log(
+    "PASS: all four themes saved to the account; Blue restored after reload.",
+  );
   const initial = await publicClient
     .from("finance_workspaces")
     .select("state,revision")

@@ -44,7 +44,10 @@ export function ChartTooltip({
           <div className="chart-tooltip-category-heading">
             <span
               className="chart-tooltip-icon"
-              style={{ color, background: `${color}18` }}
+              style={{
+                color,
+                background: `color-mix(in srgb, ${color} 10%, transparent)`,
+              }}
             >
               <Icon size={17} strokeWidth={1.8} />
             </span>

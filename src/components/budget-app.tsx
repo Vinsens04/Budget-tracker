@@ -42,6 +42,7 @@ import {
   ArrowRight,
   Eye,
   EyeOff,
+  Palette,
   type LucideIcon,
 } from "lucide-react";
 import { useFinance } from "@/lib/use-finance";
@@ -81,6 +82,8 @@ import {
 } from "./charts";
 import TransactionForm from "./transaction-form";
 import { CategoryManager, FirstSetup } from "./setup-tools";
+import { ThemePicker } from "./theme-picker";
+import { withVisualTheme, type VisualTheme } from "@/lib/themes";
 type Page =
   | "Overview"
   | "Transactions"
@@ -135,8 +138,17 @@ function download(name: string, text: string, type = "application/json") {
 }
 export default function BudgetApp() {
   const reduced = useReducedMotion();
-  const { state, user, busy, error, offline, commit, reload, configured } =
-    useFinance();
+  const {
+    state,
+    user,
+    busy,
+    error,
+    offline,
+    activeTheme,
+    commit,
+    reload,
+    configured,
+  } = useFinance();
   const [page, setPage] = useState<Page>("Overview");
   const [month, setMonth] = useState(today().slice(0, 7));
   const [period, setPeriod] = useState<Period>("Month");
@@ -159,6 +171,7 @@ export default function BudgetApp() {
   const [hidden, setHidden] = useState(false);
   const [categoryManager, setCategoryManager] = useState(false);
   const [setup, setSetup] = useState(false);
+  const [themePicker, setThemePicker] = useState(false);
   const [urlReady, setUrlReady] = useState(false);
   useEffect(() => {
     const restore = () => {
@@ -211,6 +224,17 @@ export default function BudgetApp() {
   const save = async (next: FinanceState, message: string) => {
     await commit(next, state);
     notify(message);
+  };
+  const changeTheme = async (theme: VisualTheme) => {
+    if (!state || theme === activeTheme) return;
+    try {
+      await save(
+        { ...state, settings: withVisualTheme(state.settings, theme) },
+        "Theme updated",
+      );
+    } catch (e) {
+      notify((e as Error).message);
+    }
   };
   const monthTx = useMemo(
     () => state?.transactions.filter((t) => monthOf(t.date) === month) ?? [],
@@ -457,7 +481,7 @@ export default function BudgetApp() {
               </small>
               <Progress
                 value={(g.saved / g.target) * 100}
-                color={i ? "#b5bf79" : "#2e6b50"}
+                color={colors[i % colors.length]}
               />
             </span>
             <small>{Math.round((g.saved / g.target) * 100)}%</small>
@@ -631,6 +655,14 @@ export default function BudgetApp() {
               <span className="demo-label">
                 {user ? "Connected account" : "Demo · session only"}
               </span>
+              <button
+                className="icon-button theme-menu-button"
+                aria-label="Change theme"
+                title="Change theme"
+                onClick={() => setThemePicker(true)}
+              >
+                <Palette size={20} />
+              </button>
               <button
                 className="icon-button notification-button"
                 aria-label="Notifications"
@@ -1596,12 +1628,9 @@ export default function BudgetApp() {
                           {
                             ...state,
                             settings: {
-                              ...state.settings,
+                              ...withVisualTheme(state.settings, activeTheme),
                               name: String(form.get("name")),
                               defaultWallet: String(form.get("wallet")),
-                              theme: String(
-                                form.get("theme"),
-                              ) as FinanceState["settings"]["theme"],
                               budgetAlerts: form.has("budgetAlerts"),
                               recurringAlerts: form.has("recurringAlerts"),
                               reportAlerts: form.has("reportAlerts"),
@@ -1645,11 +1674,16 @@ export default function BudgetApp() {
                       <Field label="Appearance">
                         <select
                           name="theme"
-                          defaultValue={state.settings.theme}
+                          value={activeTheme}
+                          onChange={(e) =>
+                            void changeTheme(e.target.value as VisualTheme)
+                          }
+                          disabled={busy}
                         >
-                          <option value="system">Follow system</option>
                           <option value="light">Light</option>
                           <option value="dark">Dark</option>
+                          <option value="green">Green · Original</option>
+                          <option value="blue">Blue</option>
                         </select>
                       </Field>
                     </div>
@@ -1962,6 +1996,32 @@ export default function BudgetApp() {
           {categoryManager && (
             <CategoryManager state={state} busy={busy} onSave={save} />
           )}
+        </Sheet>
+        <Sheet
+          open={themePicker}
+          title="Choose your theme"
+          onClose={() => {
+            if (!busy) setThemePicker(false);
+          }}
+        >
+          <div className="form-stack">
+            <p className="fine-print">
+              A different mood for your money. Choose a look that feels like
+              you.
+            </p>
+            <ThemePicker
+              value={activeTheme}
+              busy={busy}
+              onChange={(theme) => void changeTheme(theme)}
+            />
+            <p className="fine-print" role="status">
+              {busy
+                ? "Saving your theme…"
+                : user
+                  ? "Your theme is saved to your account."
+                  : "Your theme is remembered on this device."}
+            </p>
+          </div>
         </Sheet>
         <Sheet
           open={setup}

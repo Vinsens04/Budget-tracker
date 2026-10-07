@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "./ledger.css";
+import "./themes.css";
+import { themeInitScript } from "@/lib/themes";
 export const metadata: Metadata = {
   title: "Saldo — Your financial journal",
   description:
@@ -16,7 +18,15 @@ export default function Layout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      data-theme="light"
+      data-palette="green"
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>{children}</body>
     </html>
   );

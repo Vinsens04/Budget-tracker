@@ -3,6 +3,14 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
 import {
+  applyVisualTheme,
+  resolveVisualTheme,
+  isVisualTheme,
+  withVisualTheme,
+  themeStorageKey,
+  type VisualTheme,
+} from "./themes";
+import {
   emptyState,
   processRecurring,
   seedState,
@@ -15,6 +23,7 @@ export function useFinance() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [offline, setOffline] = useState(false);
+  const [activeTheme, setActiveTheme] = useState<VisualTheme>("green");
   const revision = useRef(0);
   const locked = useRef(false);
   const userRef = useRef<User | null>(null);
@@ -38,6 +47,13 @@ export function useFinance() {
       }
       if (!nextUser || !supabase) {
         const demo = seedState();
+        try {
+          const cached = localStorage.getItem(themeStorageKey);
+          if (isVisualTheme(cached))
+            demo.settings = withVisualTheme(demo.settings, cached);
+        } catch {
+          /* Storage can be unavailable in a private browser. */
+        }
         stateRef.current = demo;
         setState(demo);
         revision.current = 0;
@@ -180,23 +196,27 @@ export function useFinance() {
   useEffect(() => {
     if (!state) return;
     const pref = window.matchMedia("(prefers-color-scheme: dark)");
-    const apply = () =>
-      (document.documentElement.dataset.theme =
-        state.settings.theme === "system"
-          ? pref.matches
-            ? "dark"
-            : "light"
-          : state.settings.theme);
+    const apply = () => {
+      const theme = resolveVisualTheme(state.settings, pref.matches);
+      applyVisualTheme(theme);
+      setActiveTheme(theme);
+      try {
+        localStorage.setItem(themeStorageKey, theme);
+      } catch {
+        /* Account preferences still save to Supabase. */
+      }
+    };
     apply();
     pref.addEventListener("change", apply);
     return () => pref.removeEventListener("change", apply);
-  }, [state?.settings.theme]);
+  }, [state?.settings.theme, state?.settings.visualTheme]);
   return {
     state,
     user,
     busy,
     error,
     offline,
+    activeTheme,
     commit,
     reload: () => load(userRef.current),
     configured: !!supabase,
