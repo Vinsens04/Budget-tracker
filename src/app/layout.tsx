@@ -13,7 +13,7 @@ const jakarta = localFont({
   display: "swap",
 });
 const figures = localFont({
-  src: "./fonts/space-grotesk.woff2",
+  src: "./fonts/oxanium.woff2",
   variable: "--font-figures",
   weight: "400 700",
   display: "swap",

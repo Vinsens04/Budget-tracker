@@ -1,4 +1,4 @@
-/* Expressive display type, geometric figures and quiet interface text. */
+/* Expressive headings, squared digital figures and quiet interface text. */
 :root,
 body {
   font-family: var(--font-jakarta), sans-serif;
@@ -76,14 +76,14 @@ h3,
 .detail-amount,
 .chart-tooltip-amount {
   font-weight: 500;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.025em;
 }
 .balance-value {
   font-size: clamp(35px, 3.4vw, 51px);
 }
 .stat > strong {
   font-weight: 650;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
 }
 .budget-number small {
   font-family: var(--font-jakarta), sans-serif;

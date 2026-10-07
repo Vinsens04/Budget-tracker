@@ -26,7 +26,7 @@ Open http://127.0.0.1:3000. The project is already connected to your Supabase pr
 - First-use wallet/balance setup, custom expense/income categories with linked renaming, and bookmarkable screens with browser Back support.
 - Connection status, automatic refresh on reconnect/focus, and revision-conflict recovery that keeps the open form intact.
 - Four coordinated themes: Light with porcelain and sage, Dark with pure black and warm ivory, Green with deep forest and jade, and Blue with cobalt, indigo and lavender. Switch through the header palette or Profile → Appearance; account preferences sync with Supabase, while demo preferences persist on the device. Legacy system preferences remain supported until a theme is selected.
-- Locally hosted Bricolage Grotesque for expressive headings, Plus Jakarta Sans for interface text and Space Grotesk with tabular figures for financial amounts; font licenses are included with the source.
+- Locally hosted Bricolage Grotesque for expressive headings, Plus Jakarta Sans for interface text and Oxanium with squared, tabular figures for financial amounts; font licenses are included with the source.
 - Notification preferences, keyboard focus and reduced motion/transparency/contrast handling.
 
 Signed-in accounts start empty and save to Supabase. Signed-out demo data is session-only and cannot mix with account data. Financial notifications are in-app; browser push and email delivery are not configured. Receipt extraction is intentionally manual for now; OCR/AI can be added later with a review step before saving.
